@@ -92,7 +92,6 @@ public class AdsServerUtility {
             Channel channel1 = jumpServerSession.openChannel("sftp");
             channel1.connect();
             ChannelSftp sftpChannel = (ChannelSftp) channel1;
-            System.out.println("Directory:" + sftpChannel.pwd());
             InputStream pem = sftpChannel.get("phunware-developer.pem");
 
             String result = new BufferedReader(new InputStreamReader(pem))
@@ -147,12 +146,14 @@ public class AdsServerUtility {
         return output;
     }
 
-    public static void updateLog4jLoggingLevel(String env, String loggerLevel , String rootLoggerLevel) {
+    public static void updateLog4jLoggingLevel(String env, String loggerLevel , String rootLoggerLevel , String log4j2Path) {
 
-        LogInToServerExecuteShellCommandAndReturnResponse(env, "sed -i 's/\\(Logger.*name=\\\"co.*=\\\"\\).*\\(\\\"\\)/\\"+loggerLevel+"\\2/' test/test.txt");
+        log.info("Trying to update log4j2.xml presnt at -"+log4j2Path);
+
+        LogInToServerExecuteShellCommandAndReturnResponse(env, "sed -i 's/\\(Logger.*name=\\\"co.*=\\\"\\).*\\(\\\"\\)/\\"+loggerLevel+"\\2/' "+log4j2Path);
         log.info("Updated Logger level to - "+loggerLevel);
 
-        LogInToServerExecuteShellCommandAndReturnResponse(env, "sed -i 's/\\(Root.*=\\\"\\).*\\(\\\"\\)/\\1"+rootLoggerLevel+"\\2/' test/test.txt");
+        LogInToServerExecuteShellCommandAndReturnResponse(env, "sed -i 's/\\(Root.*=\\\"\\).*\\(\\\"\\)/\\1"+rootLoggerLevel+"\\2/' "+log4j2Path);
         log.info("Updated Root Logger level to - "+rootLoggerLevel);
     }
     
