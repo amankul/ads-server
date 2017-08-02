@@ -24,6 +24,5 @@
 .gradle/
 .idea/
 Logging.log
-build.gradle
 build/
 out/

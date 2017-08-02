@@ -14,7 +14,7 @@
 		<parameter name="creativeRequestEndPoint" value="/api/v1.0/creatives" />
 
 		<classes>
-			<!--<class name="com.phunware.ads.tests.Customer"/>-->
+			<class name="com.phunware.ads.tests.Targeting"/>
 		</classes>
 	</test>
 </suite>

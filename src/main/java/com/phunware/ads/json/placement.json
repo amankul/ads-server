@@ -32,11 +32,6 @@
       "platformId": "platformId2ToBeChanged",
       "minOSVersion": "minOSVersion2ToBeChanged",
       "maxOSVersion": "maxOSVersion2ToBeChanged"
-    },
-    {
-      "platformId": "platformId3ToBeChanged",
-      "minOSVersion": "minOSVersion3ToBeChanged",
-      "maxOSVersion": "maxOSVersion3ToBeChanged"
     }
   ],
   "domains": [
@@ -49,11 +44,6 @@
       "domain": "domain2ToBeChanged",
       "trafficSourceId": "trafficSourceId2ToBeChanged",
       "exclude": false
-    },
-    {
-      "domain": "domain3ToBeChanged",
-      "trafficSourceId": "trafficSourceId3ToBeChanged",
-      "exclude": true
     }
   ],
   "bundleIds": [
@@ -66,12 +56,8 @@
       "bundleId": "bundleID2ToBeChanged",
       "trafficSourceId": "trafficSourceId2ToBeChanged",
       "exclude": false
-    },
-    {
-      "bundleId": "bundleID3ToBeChanged",
-      "trafficSourceId": "trafficSourceId3ToBeChanged",
-      "exclude": true
     }
+
   ],
   "trafficSources": [
     {
@@ -81,10 +67,6 @@
     {
       "trafficSourceId" : "trafficSourceId2ToBeChanged",
       "exclude": false
-    },
-    {
-      "trafficSourceId" : "trafficSourceId3ToBeChanged",
-      "exclude": true
     }
   ],
   "locations": [
@@ -116,10 +98,6 @@
     {
       "demographicId": "demographicId2ToBeChanged",
       "exclude": false
-    },
-    {
-      "demographicId": "demographicId3ToBeChanged",
-      "exclude": true
     }
   ]
 }

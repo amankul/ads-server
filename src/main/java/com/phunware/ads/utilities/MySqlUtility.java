@@ -114,8 +114,8 @@ public class MySqlUtility {
       //log.trace("Established DB Connection....");
 
       //Execute query and capture result set
-      log.info("Executing Query....");
-      log.info(dbQuery);
+      log.debug("Executing Query....");
+      log.debug(dbQuery);
       ResultSet rs = stmt.executeQuery(dbQuery);
 
       //Processing result - storing each row as an element in arraylist.
