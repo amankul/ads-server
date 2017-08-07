@@ -27,11 +27,6 @@
       "platformId": "platformId1ToBeChanged",
       "minOSVersion": "minOSVersion1ToBeChanged",
       "maxOSVersion": "maxOSVersion1ToBeChanged"
-    },
-    {
-      "platformId": "platformId2ToBeChanged",
-      "minOSVersion": "minOSVersion2ToBeChanged",
-      "maxOSVersion": "maxOSVersion2ToBeChanged"
     }
   ],
   "domains": [
@@ -71,12 +66,8 @@
   ],
   "locations": [
     {
-      "latitude" : 34.965397,
-      "longitude": -84.16351
-    },
-    {
-      "latitude" : 33.985348,
-      "longitude": -81.38331
+      "latitude" : 30.3583022,
+      "longitude": -97.7304637
     }
   ],
   "creativeIds": ["creativeIDsToBeChanged"],
@@ -85,10 +76,10 @@
   "dmaIds": [100,351,398,399,400],
   "cityIds":[1,100,1000,10001,118051],
   "languageIds": [1,2,3,4,38,50],
-  "carrierIds": [1,2,3,4,100],
-  "deviceTypeIds": [1,2],
-  "deviceIds": [1,10,100,200,1000],
-  "brandIds": [1,2,3,4,5],
+  "carrierIds": [1,2,3,571],
+  "deviceTypeIds": [1],
+  "deviceIds": [1,10,100,200,81],
+  "brandIds": [1,2,3,4,5,9],
   "zips": ["78757","78758","78759"],
   "demographics": [
     {

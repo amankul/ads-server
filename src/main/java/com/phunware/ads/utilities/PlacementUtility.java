@@ -27,9 +27,6 @@ public class PlacementUtility {
     private static String platformId1;
     private static String minOSVersion1;
     private static String maxOSVersion1;
-    private static String platformId2;
-    private static String minOSVersion2;
-    private static String maxOSVersion2;
     private static String domain1;
     private static String trafficSourceId1;
     private static String domain2;
@@ -65,11 +62,8 @@ public class PlacementUtility {
                         .replaceAll("dailyFcapToBeChanged", dailyFcap)
                         .replaceAll("dealIdToBeChanged", dealId)
                         .replaceAll("platformId1ToBeChanged", platformId1)
-                        .replaceAll("platformId2ToBeChanged", platformId2)
                         .replaceAll("minOSVersion1ToBeChanged", minOSVersion1)
-                        .replaceAll("minOSVersion2ToBeChanged", minOSVersion2)
                         .replaceAll("maxOSVersion1ToBeChanged", maxOSVersion1)
-                        .replaceAll("maxOSVersion2ToBeChanged", maxOSVersion2)
                         .replaceAll("domain1ToBeChanged", domain1)
                         .replaceAll("domain2ToBeChanged", domain2)
                         .replaceAll("trafficSourceId1ToBeChanged", trafficSourceId1)
@@ -98,7 +92,7 @@ public class PlacementUtility {
                         .response();
 
         //printing response
-        log.debug("RESPONSE:" + response.asString());
+        log.info("RESPONSE:" + response.asString());
         log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
 
         //capturing created lineItem ID
@@ -173,12 +167,9 @@ public class PlacementUtility {
         pacingTypeId = "1";   //1,2
         dailyFcap = "100";  //integer
         dealId = "AutomationDealID";  //String
-        platformId1 = "1";   //1-8
-        minOSVersion1 = "1.2.3";
-        maxOSVersion1 = "3.4.5";
-        platformId2 = "1";  //1-8
-        minOSVersion2 = "6";
-        maxOSVersion2 = "9";
+        platformId1 = "2";   //1-8
+        minOSVersion1 = "5.1.2";
+        maxOSVersion1 = "8";
         domain1 = "https://www.domain1.com";   //alphanumeric String
         domain2 = "https://www.domain2.com";  //alphanumeric String
         trafficSourceId1 = "1";    //1,2,3

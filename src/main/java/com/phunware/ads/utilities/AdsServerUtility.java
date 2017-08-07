@@ -64,9 +64,9 @@ public class AdsServerUtility {
 
     }
 
-    public static String LogInToServerExecuteShellCommandAndReturnResponse(String env, String shellCommand) {
+    public static String LogInToServerExecuteShellCommandAndReturnResponse(String serviceEndPoint, String shellCommand) {
 
-        initialize(env);
+        initialize(serviceEndPoint);
         String output = "";
 
 
@@ -80,7 +80,7 @@ public class AdsServerUtility {
             jumpServerSession.setPassword(jumpServerSshPassword);
             jumpServerSession.setConfig(config);
             jumpServerSession.connect();
-            log.info("SSH Connected - connected to jump server - " + jumpServerSshHostName);
+            log.debug("SSH Connected - connected to jump server - " + jumpServerSshHostName);
 
             //Change the port number if the port is already used.
             int localPort = 15006;
@@ -97,16 +97,21 @@ public class AdsServerUtility {
             String result = new BufferedReader(new InputStreamReader(pem))
                     .lines().collect(Collectors.joining("\n"));
 
+            //writing data to pem file
+            //Note: data will be flushed out as soon as this method done executing.
+            writeToFile(result);
 
             //using a .pem file to get access to ssh
-            String pemFileLocation = System.getProperty("user.dir") + "/src/main/resources/phunware-developer.pem";
+            String pemFileLocation = System.getProperty("user.dir") + "/src/main/resources/pemfile.pem";
+
+            //using a .pem file to get access to ssh
             jsch.addIdentity(pemFileLocation, serverPassword);
 
             //Connecting to actual server -- syntax --> ssh -i filename.pem user@server
             serverSession = jsch.getSession(serverUser, "localhost", assingedPort);
             serverSession.setConfig(config);
             serverSession.connect(30000);
-            log.info("SSH Connected - connected to server - " + serverHostName);
+            log.debug("SSH Connected - connected to server - " + serverHostName);
 
             //Executing and printing shell commands
             Channel channel = serverSession.openChannel("exec");
@@ -130,42 +135,42 @@ public class AdsServerUtility {
                 }
             }
 
-            log.info("SSH Sessions Getting Disconnected - No Exceptions Observed");
-        }
-
-        catch (Exception e) {
-            log.info("SSH Sessions Getting Disconnected - Exception observed");
+            log.debug("SSH Sessions Getting Disconnected - No Exceptions Observed");
+        } catch (Exception e) {
+            log.debug("SSH Sessions Getting Disconnected - Exception observed");
             e.printStackTrace();
-        }
-
-        finally {
+        } finally {
             serverSession.disconnect();
             jumpServerSession.disconnect();
+            writeToFile("");
         }
 
         return output;
     }
 
-    public static void updateLog4jLoggingLevel(String env, String loggerLevel , String rootLoggerLevel , String log4j2Path) {
+    public static void updateLog4jLoggingLevel(String serviceEndPoint, String loggerLevel, String rootLoggerLevel) {
 
-        log.info("Trying to update log4j2.xml presnt at -"+log4j2Path);
+        // TODO - Update log4j2Path to have a dynamic path if it is not the same for all the environments.
 
-        LogInToServerExecuteShellCommandAndReturnResponse(env, "sed -i 's/\\(Logger.*name=\\\"co.*=\\\"\\).*\\(\\\"\\)/\\"+loggerLevel+"\\2/' "+log4j2Path);
-        log.info("Updated Logger level to - "+loggerLevel);
+        String log4j2Path = "/opt/phunware/dsp/current/log4j2.xml";
+        log.info("Trying to update log4j2.xml present at -" + log4j2Path);
 
-        LogInToServerExecuteShellCommandAndReturnResponse(env, "sed -i 's/\\(Root.*=\\\"\\).*\\(\\\"\\)/\\1"+rootLoggerLevel+"\\2/' "+log4j2Path);
-        log.info("Updated Root Logger level to - "+rootLoggerLevel);
+        LogInToServerExecuteShellCommandAndReturnResponse(serviceEndPoint, "sed -i 's/\\(Logger.*name=\\\"co.*=\\\"\\).*\\(\\\"\\)/\\1" + loggerLevel + "\\2/' " + log4j2Path);
+        log.info("Updated Logger level to - " + loggerLevel);
+
+        LogInToServerExecuteShellCommandAndReturnResponse(serviceEndPoint, "sed -i 's/\\(Root.*=\\\"\\).*\\(\\\"\\)/\\1" + rootLoggerLevel + "\\2/' " + log4j2Path);
+        log.info("Updated Root Logger level to - " + rootLoggerLevel);
+
     }
-    
-    public static void writeToFIle(String data){
-        
+
+    public static void writeToFile(String data) {
+
         try {
             File myPemFile = new File(System.getProperty("user.dir") + "/src/main/resources/pemfile.pem");
             FileOutputStream pemFileStream = new FileOutputStream(myPemFile, true); // true to append
             pemFileStream.write(data.getBytes());
             pemFileStream.close();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

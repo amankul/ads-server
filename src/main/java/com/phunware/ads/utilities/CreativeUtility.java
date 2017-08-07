@@ -57,7 +57,7 @@ public class CreativeUtility {
                         .response();
 
         //printing response
-        log.debug("RESPONSE:" + response.asString());
+        log.info("RESPONSE:" + response.asString());
         log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
 
         //capturing created lineItem ID
@@ -93,7 +93,7 @@ public class CreativeUtility {
     }
 
 
-    public static void updateCreative(String serviceEndPoint, String creativeRequestEndPoint, String auth, String creativeID , String statusID) {
+    public static void updateCreative(String serviceEndPoint, String creativeRequestEndPoint, String auth, String creativeID, String statusID) {
 
         //Request Details
         String requestURL = serviceEndPoint + creativeRequestEndPoint + "/" + creativeID;
@@ -107,7 +107,7 @@ public class CreativeUtility {
                         .header("Content-Type", "application/json")
                         .header("Authorization", auth)
                         .request()
-                        .body("{\"statusId\": "+statusID+"}")
+                        .body("{\"statusId\": " + statusID + "}")
                         .put(requestURL)
                         .then()
                         .statusCode(200)
@@ -117,7 +117,6 @@ public class CreativeUtility {
         log.info("Updated Creative ID -" + creativeID + ", Status to Running - 600");
 
     }
-
 
 
     public static void initializeData(String serviceEndPoint) {
