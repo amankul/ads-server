@@ -97,6 +97,32 @@ public class LineItemUtility {
     }
 
 
+    public static void updateLineItem(String serviceEndPoint, String lineItemRequestEndPoint, String auth, String lineItemID , String statusID) {
+
+        //Request Details
+        String requestURL = serviceEndPoint + lineItemRequestEndPoint + "/" + lineItemID;
+
+        //Printing Request Details
+        log.debug("REQUEST-URL:PUT-" + requestURL);
+
+        //Extracting response after status code validation
+        Response response =
+                given()
+                        .header("Content-Type", "application/json")
+                        .header("Authorization", auth)
+                        .request()
+                        .body("{\"statusId\": "+statusID+"}")
+                        .put(requestURL)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .response();
+
+        log.info("Updated LineItem ID -" + lineItemID + ", Status to Running - 600");
+
+    }
+
+
     public static void initializeData(String serviceEndPoint) {
 
         randomvalue = "LineItem" + LocalDateTime.now().toString().replaceAll("[-:.T]", "");

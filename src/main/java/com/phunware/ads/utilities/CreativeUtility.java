@@ -93,6 +93,33 @@ public class CreativeUtility {
     }
 
 
+    public static void updateCreative(String serviceEndPoint, String creativeRequestEndPoint, String auth, String creativeID , String statusID) {
+
+        //Request Details
+        String requestURL = serviceEndPoint + creativeRequestEndPoint + "/" + creativeID;
+
+        //Printing Request Details
+        log.debug("REQUEST-URL:PUT-" + requestURL);
+
+        //Extracting response after status code validation
+        Response response =
+                given()
+                        .header("Content-Type", "application/json")
+                        .header("Authorization", auth)
+                        .request()
+                        .body("{\"statusId\": "+statusID+"}")
+                        .put(requestURL)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .response();
+
+        log.info("Updated Creative ID -" + creativeID + ", Status to Running - 600");
+
+    }
+
+
+
     public static void initializeData(String serviceEndPoint) {
 
         randomvalue = "Creative" + LocalDateTime.now().toString().replaceAll("[-:.T]", "");

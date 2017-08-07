@@ -134,6 +134,32 @@ public class PlacementUtility {
     }
 
 
+    public static void updatePlacement(String serviceEndPoint, String placementRequestEndPoint, String auth, String placementID , String statusID) {
+
+        //Request Details
+        String requestURL =
+                serviceEndPoint + placementRequestEndPoint + "/" + placementID;
+
+        //Printing Request Details
+        log.debug("REQUEST-URL:PUT-" + requestURL);
+
+        //Extracting response after status code validation
+        Response response =
+                given()
+                        .header("Content-Type", "application/json")
+                        .header("Authorization", auth)
+                        .request()
+                        .body("{\"statusId\": "+statusID+"}")
+                        .put(requestURL)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .response();
+
+        log.info("Updated Placement ID -" + placementID + ", Status to Running - 600");
+
+    }
+
     public static void initializeData(String serviceEndPoint) {
 
         randomvalue = "Placement" + LocalDateTime.now().toString().replaceAll("[-:.T]", "");

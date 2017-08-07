@@ -88,6 +88,27 @@ public class CampaignUtility {
         log.info("Deleted Campaign ID -" + campaignID);
     }
 
+    public static void updateCampaign(String serviceEndPoint, String campaignRequestEndPoint, String auth, String campaignID , String statusID) {
+
+        //Request Details
+        String requestURL = serviceEndPoint + campaignRequestEndPoint + "/" + campaignID;
+
+        //Extracting response after status code validation
+        Response response =
+                given()
+                        .header("Content-Type", "application/json")
+                        .header("Authorization", auth)
+                        .request()
+                        .body("{\"statusId\": "+statusID+"}")
+                        .put(requestURL)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .response();
+
+        log.info("Updated Campaign ID -" + campaignID + ", Status to Running - 600");
+    }
+
 
     public static int getAdvertiserID(String serviceEndPoint) {
         String sqlQuery = "select id from advertiser where is_active = 1 limit 1";
