@@ -46,12 +46,12 @@ public class MySqlUtility {
       SSH_HOSTNAME = "att-stagegw01.phunware.com";
       SSH_PORT = 22;
       //db details
-      MY_SQL_HOSTNAME = "tapitdb.cbajwkfi6hwe.us-east-1.rds.amazonaws.com";
+      MY_SQL_HOSTNAME = "att-devaddb01";
       DATABASE = "abm_db";
       LOCALPORT = 3366;
       REMOTEPORT = 3306;
-      DB_USERNAME = "tapituser";
-      DB_PASSWORD = "t4pt4p11";
+      DB_USERNAME = "abmuser";
+      DB_PASSWORD = "abmuser%$45";
     }
 
     if (serviceEndPoint.matches(".*?stage.*?")) {

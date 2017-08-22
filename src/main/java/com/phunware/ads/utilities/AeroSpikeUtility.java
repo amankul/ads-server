@@ -50,10 +50,9 @@ public class AeroSpikeUtility {
       //Actual Server
       aerospikeserverUser = "ec2-user";
       aerospikeserverPassword = "phunware10";
-      aerospikeserverHostName = "ec2-54-237-10-197.compute-1.amazonaws.com";
+      aerospikeserverHostName = "att-devaddspaero01";  //OLD ONE "ec2-54-237-10-197.compute-1.amazonaws.com";
       aerospikeserverSshPort = 22;
     }
-
 
     //TODO UPDATE THESE DETAILS AFTER THE STAGE ENV IS READY.
     if (env.matches(".*?stage.*?")) {
@@ -66,7 +65,7 @@ public class AeroSpikeUtility {
       //Actual Server
       aerospikeserverUser = "developer";
       aerospikeserverPassword = "phunware10";
-      aerospikeserverHostName = "att-stageadabmapi01";
+      aerospikeserverHostName = "att-stageaddspaero01";
       aerospikeserverSshPort = 22;
     }
 

@@ -17,10 +17,10 @@ public class CreativeUtility {
     private static String creativeID;
     private static ArrayList<String> dbResult;
     private static String advertiserId;
-    private static String creativeTypeId;
-    private static String clickurl;
-    private static String iurlS3AssetId;
-    private static String s3Asset;
+//    private static String creativeTypeId;
+//    private static String clickurl;
+//    private static String iurlS3AssetId;
+//    private static String s3Asset;
 
     public static String createCreative(String serviceEndPoint, String auth, String creativeRequestEndPoint) {
 
@@ -33,11 +33,8 @@ public class CreativeUtility {
                         System.getProperty("user.dir")
                                 + "/src/main/java/com/phunware/ads/json/creative.json")
                         .replaceAll("advertiserIdToBeChanged", advertiserId)
-                        .replaceAll("nameToBeChanged", randomvalue)
-                        .replaceAll("creativeTypeIdToBeChanged", creativeTypeId)
-                        .replaceAll("clickURLToBeChanged", clickurl)
-                        .replaceAll("iurlS3AssetIdToBeChanged", iurlS3AssetId)
-                        .replaceFirst(":\\[\\]", ":\\[" + s3Asset + "\\]"); //replacing s3AssetId
+                        .replaceAll("nameToBeChanged", randomvalue);
+
 
         //Printing Request Details
         log.debug("REQUEST-URL:POST-" + requestURL);
@@ -57,7 +54,7 @@ public class CreativeUtility {
                         .response();
 
         //printing response
-        log.info("RESPONSE:" + response.asString());
+        log.debug("RESPONSE:" + response.asString());
         log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
 
         //capturing created lineItem ID
@@ -89,7 +86,7 @@ public class CreativeUtility {
                         .extract()
                         .response();
 
-        log.info("Deleted Creative ID -" + creativeID);
+        log.info("Deleted Creative ID - " + creativeID);
     }
 
 
@@ -114,7 +111,7 @@ public class CreativeUtility {
                         .extract()
                         .response();
 
-        log.info("Updated Creative ID -" + creativeID + ", Status to Running - 600");
+        log.info("Updated Creative ID - " + creativeID + ", Status to Running - "+statusID);
 
     }
 
@@ -129,21 +126,6 @@ public class CreativeUtility {
         advertiserId = dbResult.get(0);
         dbResult.clear();
 
-        //Capturing iurlS3AssetId from DB
-        String sqlQuery_iurlS3AssetId = "select id from s3_asset where  status_id not in (100) limit 1";
-        dbResult = MySqlUtility.query_Post_connection_To_MySQL_Via_JumpServer(sqlQuery_iurlS3AssetId, serviceEndPoint);
-        iurlS3AssetId = dbResult.get(0);
-        dbResult.clear();
-
-        creativeTypeId = "1";   //1 banner, 2 FullScreen, 3 Video, 4 Native
-        clickurl = "http://www.clickurl1.com";
-
-        //s3asset ID from db
-        //Update this to match with the `creativeTypeId`
-        String sqlQuery_S3AssetId = "select id from s3_asset where  status_id not in (100) limit 1,1";
-        dbResult = MySqlUtility.query_Post_connection_To_MySQL_Via_JumpServer(sqlQuery_S3AssetId, serviceEndPoint);
-        s3Asset = dbResult.get(0);
-        dbResult.clear();
     }
 
 

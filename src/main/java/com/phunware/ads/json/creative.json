@@ -1,12 +1,12 @@
 {
   "advertiserId": "advertiserIdToBeChanged",
   "name": "nameToBeChanged",
-  "creativeTypeId": "creativeTypeIdToBeChanged",
+  "creativeTypeId": 1,
   "secure": true,
   "attributeIds": [1,2,3],
-  "clickurl":"clickURLToBeChanged",
-  "iurlS3AssetId": "iurlS3AssetIdToBeChanged",
-  "s3AssetIds": [],
+  "clickurl":"http://www.clickurl1.com",
+  "iurlS3AssetId": 10011,
+  "s3AssetIds": [10005],
   "dimensionIds": [1],
   "trackingUrls":["http://www.phunware2.com", "www.phunware3.com/aaa","http://www.phunware4.com","http://www.phunware5.com","http://www.phunware6.com"]
 }

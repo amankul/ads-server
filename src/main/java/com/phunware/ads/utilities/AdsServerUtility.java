@@ -42,9 +42,9 @@ public class AdsServerUtility {
             jumpServerSshPort = 22;
 
             //Actual Server
-            serverUser = "root";
+            serverUser = "developer";
             serverPassword = "phunware10";
-            serverHostName = "att-devadscratch01";
+            serverHostName = "att-devadsrv01";
             serverSshPort = 22;
         }
 
@@ -58,16 +58,17 @@ public class AdsServerUtility {
             //Actual Server
             serverUser = "developer";
             serverPassword = "phunware10";
-            serverHostName = "att-stageadabmapi01";
+            serverHostName = "att-stageadsrv01";
             serverSshPort = 22;
         }
 
     }
 
-    public static String LogInToServerExecuteShellCommandAndReturnResponse(String serviceEndPoint, String shellCommand) {
+    public static String logInToServerExecuteShellCommandAndReturnResponse(String serviceEndPoint, String shellCommand) {
 
         initialize(serviceEndPoint);
         String output = "";
+        log.debug("Executing Command -"+ shellCommand);
 
 
         try {
@@ -130,7 +131,7 @@ public class AdsServerUtility {
                     output = output + (new String(temp, 0, i));
                 }
                 if (channel.isClosed()) {
-                    System.out.println("exit-status: " + channel.getExitStatus());
+                    log.debug("exit-status: " + channel.getExitStatus());
                     break;
                 }
             }
@@ -148,18 +149,14 @@ public class AdsServerUtility {
         return output;
     }
 
-    public static void updateLog4jLoggingLevel(String serviceEndPoint, String loggerLevel, String rootLoggerLevel) {
+    public static void updateLog4jLoggingLevel(String serviceEndPoint, String loggerLevel) {
 
         // TODO - Update log4j2Path to have a dynamic path if it is not the same for all the environments.
-
         String log4j2Path = "/opt/phunware/dsp/current/log4j2.xml";
-        log.info("Trying to update log4j2.xml present at -" + log4j2Path);
 
-        LogInToServerExecuteShellCommandAndReturnResponse(serviceEndPoint, "sed -i 's/\\(Logger.*name=\\\"co.*=\\\"\\).*\\(\\\"\\)/\\1" + loggerLevel + "\\2/' " + log4j2Path);
+        //LogInToServerExecuteShellCommandAndReturnResponse(serviceEndPoint, "sed -i 's/\\(Logger.*name=\\\"co.*=\\\"\\).*\\(\\\"\\)/\\1" + loggerLevel + "\\2/' " + log4j2Path);
+        logInToServerExecuteShellCommandAndReturnResponse(serviceEndPoint,"sudo -u root /bin/cp /home/developer/Automation/log4j2.xml /opt/phunware/dsp/current/log4j2.xml");
         log.info("Updated Logger level to - " + loggerLevel);
-
-        LogInToServerExecuteShellCommandAndReturnResponse(serviceEndPoint, "sed -i 's/\\(Root.*=\\\"\\).*\\(\\\"\\)/\\1" + rootLoggerLevel + "\\2/' " + log4j2Path);
-        log.info("Updated Root Logger level to - " + rootLoggerLevel);
 
     }
 
@@ -167,13 +164,16 @@ public class AdsServerUtility {
 
         try {
             File myPemFile = new File(System.getProperty("user.dir") + "/src/main/resources/pemfile.pem");
-            FileOutputStream pemFileStream = new FileOutputStream(myPemFile, true); // true to append
+            FileOutputStream pemFileStream = new FileOutputStream(myPemFile, false);
             pemFileStream.write(data.getBytes());
             pemFileStream.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
+
 
 
 }

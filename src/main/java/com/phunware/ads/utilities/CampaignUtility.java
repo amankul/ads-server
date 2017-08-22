@@ -85,7 +85,7 @@ public class CampaignUtility {
                 .extract()
                 .response();
 
-        log.info("Deleted Campaign ID -" + campaignID);
+        log.info("Deleted Campaign ID - " + campaignID);
     }
 
     public static void updateCampaign(String serviceEndPoint, String campaignRequestEndPoint, String auth, String campaignID , String statusID) {
@@ -106,7 +106,7 @@ public class CampaignUtility {
                         .extract()
                         .response();
 
-        log.info("Updated Campaign ID -" + campaignID + ", Status to Running - 600");
+        log.info("Updated Campaign ID - " + campaignID + ", Status Updated to - " + statusID);
     }
 
 

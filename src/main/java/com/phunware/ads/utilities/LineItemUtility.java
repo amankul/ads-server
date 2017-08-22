@@ -93,7 +93,7 @@ public class LineItemUtility {
                         .extract()
                         .response();
 
-        log.info("Deleted LineItem -" + lineItemID);
+        log.info("Deleted LineItem - " + lineItemID);
     }
 
 
@@ -118,7 +118,7 @@ public class LineItemUtility {
                         .extract()
                         .response();
 
-        log.info("Updated LineItem ID -" + lineItemID + ", Status to Running - 600");
+        log.info("Updated LineItem ID - " + lineItemID + ", Status Updated to - " + statusID);
 
     }
 

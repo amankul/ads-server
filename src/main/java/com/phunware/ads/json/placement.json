@@ -1,77 +1,72 @@
 {
   "lineItemId": "lineItemIDToBeChanged",
   "name": "nameToBeChanged",
-  "bid": "bidToBeChanged",
-  "budgetDaily": "budgetDailyToBeChanged",
-  "targetWifi": true,
+  "bid": 1.5,
+  "budgetDaily": 100,
+  "targetWifi": false,
   "targetApp": true,
   "targetMobileWeb": true,
-  "locationRadius": "locationRadiusToBeChanged",
+  "locationRadius": 88.76,
   "requireDeviceId": true,
   "deviceIdIdfa": true,
   "deviceIdAndroidId": true,
   "deviceIdGoogleAdvertisingId": true,
-  "optimizationTarget": "optTargetToBeChanged",
-  "optimizationTargetTypeId": "optTargetTypeIDToBeChanged",
-  "optimizationSampleSize": "optSampleSizeToBeChanged",
-  "optimizationSampleSizeTypeId": "optSampleSizeTypeIdToBeChanged",
+  "optimizationTarget": 2,
+  "optimizationTargetTypeId": 1,
+  "optimizationSampleSize": 10,
+  "optimizationSampleSizeTypeId": 1,
   "optimizationEmailNotification": true,
-  "pacingTypeId": "PacingTypeIdToBeChanged",
-  "dailyFcap": "dailyFcapToBeChanged",
+  "pacingTypeId": 1,
+  "dailyFcap": 100,
   "male": true,
   "female": false,
   "otherGender": true,
-  "dealId": "dealIdToBeChanged",
+  "dealId": "AutomationDealID",
   "platforms": [
     {
-      "platformId": "platformId1ToBeChanged",
-      "minOSVersion": "minOSVersion1ToBeChanged",
-      "maxOSVersion": "maxOSVersion1ToBeChanged"
+      "maxOSVersion": "8",
+      "platformId": 2,
+      "minOSVersion": "5.1.2"
     }
   ],
   "domains": [
     {
-      "domain": "domain1ToBeChanged",
-      "trafficSourceId": "trafficSourceId1ToBeChanged",
-      "exclude": true
+      "domain": "https://www.domain2.com",
+      "trafficSourceId": 2,
+      "exclude": false
     },
     {
-      "domain": "domain2ToBeChanged",
-      "trafficSourceId": "trafficSourceId2ToBeChanged",
-      "exclude": false
+      "domain": "https://www.domain1.com",
+      "trafficSourceId": 1,
+      "exclude": true
     }
   ],
   "bundleIds": [
     {
-      "bundleId": "bundleID1ToBeChanged",
-      "trafficSourceId": "trafficSourceId1ToBeChanged",
+      "trafficSourceId": 1,
+      "bundleId": "bundleid1",
       "exclude": true
     },
     {
-      "bundleId": "bundleID2ToBeChanged",
-      "trafficSourceId": "trafficSourceId2ToBeChanged",
+      "trafficSourceId": 2,
+      "bundleId": "bundleid2",
       "exclude": false
     }
-
   ],
   "trafficSources": [
     {
-      "trafficSourceId" : "trafficSourceId1ToBeChanged",
+      "trafficSourceId": 2,
       "exclude": true
-    },
-    {
-      "trafficSourceId" : "trafficSourceId2ToBeChanged",
-      "exclude": false
     }
   ],
   "locations": [
     {
-      "latitude" : 30.3583022,
+      "latitude": 30.3583022,
       "longitude": -97.7304637
     }
   ],
   "creativeIds": ["creativeIDsToBeChanged"],
-  "countryIds": [1,2,3,4,5,6,7,8,9,10,100,229],
+  "countryIds": [1,2,3,4,5,6,7,8,9,100,229],
   "stateIds": [1,2,3,4,5,51],
   "dmaIds": [100,351,398,399,400],
   "cityIds":[1,100,1000,10001,118051],
@@ -80,17 +75,8 @@
   "deviceTypeIds": [1],
   "deviceIds": [1,10,100,200,81],
   "brandIds": [1,2,3,4,5,9],
-  "zips": ["78757","78758","78759"],
-  "demographics": [
-    {
-      "demographicId": "demographicId1ToBeChanged",
-      "exclude": true
-    },
-    {
-      "demographicId": "demographicId2ToBeChanged",
-      "exclude": false
-    }
-  ]
+  "zips": ["78757","78758","78759","78726"],
+  "demographics": []
 }
 
 
