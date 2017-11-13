@@ -8,14 +8,16 @@
 	<parameter name="authExpired" value="Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE0OTkzNzE0NjksImV4cCI6MTQ5OTM3MjY3NiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSJ9.yWT5TTUWjT9rTwHyHEM5pXYUm5Hb8oaaRKUMosgFG2s"/>
 
 
-	<test name=" SERVER API " >
-		<parameter name="campaignRequestEndPoint" value="/api/v1.0/campaigns" />
-		<parameter name="lineItemRequestEndPoint" value="/api/v1.0/lineitems" />
-		<parameter name="placementRequestEndPoint" value="/api/v1.0/placements" />
-		<parameter name="creativeRequestEndPoint" value="/api/v1.0/creatives" />
+	<test name=" SERVER API ">
+		<parameter name="campaignRequestEndPoint" value="/api/v1.0/campaigns"/>
+		<parameter name="lineItemRequestEndPoint" value="/api/v1.0/lineitems"/>
+		<parameter name="placementRequestEndPoint" value="/api/v1.0/placements"/>
+		<parameter name="creativeRequestEndPoint" value="/api/v1.0/creatives"/>
 
 		<classes>
 			<class name="com.phunware.ads.tests.Targeting"/>
+			<class name="com.phunware.ads.tests.CostAndSpend"/>
+			<class name="com.phunware.ads.tests.Capping"/>
 		</classes>
 	</test>
 </suite>

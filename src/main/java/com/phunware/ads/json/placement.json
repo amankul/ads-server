@@ -2,7 +2,7 @@
   "lineItemId": "lineItemIDToBeChanged",
   "name": "nameToBeChanged",
   "bid": 1.5,
-  "budgetDaily": 100,
+  "budgetDaily": 1,
   "targetWifi": false,
   "targetApp": true,
   "targetMobileWeb": true,
@@ -21,7 +21,7 @@
   "male": true,
   "female": false,
   "otherGender": true,
-  "dealId": "AutomationDealID",
+  "dealId": "DealIDAutomation",
   "platforms": [
     {
       "maxOSVersion": "8",

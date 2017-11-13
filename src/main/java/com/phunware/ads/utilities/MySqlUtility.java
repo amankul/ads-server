@@ -13,13 +13,13 @@ import java.util.Properties;
 /** Created by pavankovurru on 4/26/17. */
 public class MySqlUtility {
 
-  //ssh details
+  // ssh details
   private static String SSH_USER;
   private static String SSH_PASSWORD;
   private static String SSH_HOSTNAME;
   private static int SSH_PORT;
 
-  //db details
+  // db details
   private static String MY_SQL_HOSTNAME;
   private static String DATABASE;
   private static int LOCALPORT;
@@ -31,21 +31,22 @@ public class MySqlUtility {
   private static Session session;
   public static ArrayList<String> dbResult = new ArrayList<>();
 
-  //Initiating Logger Object
+  // Initiating Logger Object
   private static final Logger log = LogManager.getLogger();
 
-  //Use this to connect to mySQL db via jump server , send sql query and retrieve each row as an arraylist element
+  // Use this to connect to mySQL db via jump server , send sql query and retrieve each row as an
+  // arraylist element
   public static ArrayList query_Post_connection_To_MySQL_Via_JumpServer(
       String dbQuery, String serviceEndPoint) {
 
     if (serviceEndPoint.matches(".*?dev.*?")) {
 
-      //ssh details
+      // ssh details
       SSH_USER = "pkovurru";
       SSH_PASSWORD = "pa55word";
       SSH_HOSTNAME = "att-stagegw01.phunware.com";
       SSH_PORT = 22;
-      //db details
+      // db details
       MY_SQL_HOSTNAME = "att-devaddb01";
       DATABASE = "abm_db";
       LOCALPORT = 3366;
@@ -56,12 +57,12 @@ public class MySqlUtility {
 
     if (serviceEndPoint.matches(".*?stage.*?")) {
 
-      //ssh details
+      // ssh details
       SSH_USER = "pkovurru";
       SSH_PASSWORD = "pa55word";
       SSH_HOSTNAME = "att-stagegw01.phunware.com";
       SSH_PORT = 22;
-      //db details
+      // db details
       MY_SQL_HOSTNAME = "att-stageaddb01";
       DATABASE = "abm_db";
       LOCALPORT = 3366;
@@ -75,7 +76,7 @@ public class MySqlUtility {
       Properties config = new Properties();
       config.put(
           "StrictHostKeyChecking",
-          "no"); //Set StrictHostKeyChecking property to avoid UnknownHostKey issue
+          "no"); // Set StrictHostKeyChecking property to avoid UnknownHostKey issue
 
       JSch jsch = new JSch();
       session = jsch.getSession(SSH_USER, SSH_HOSTNAME, SSH_PORT);
@@ -83,11 +84,11 @@ public class MySqlUtility {
       session.setConfig(config);
 
       session.connect();
-      //log.trace("SSH Connected");
+      // log.trace("SSH Connected");
 
       int assinged_port = session.setPortForwardingL(LOCALPORT, MY_SQL_HOSTNAME, REMOTEPORT);
-      //log.trace("localhost:"+assinged_port+" -> "+MY_SQL_HOSTNAME+":"+REMOTEPORT);
-      //log.trace("Port Forwarded");
+      // log.trace("localhost:"+assinged_port+" -> "+MY_SQL_HOSTNAME+":"+REMOTEPORT);
+      // log.trace("Port Forwarded");
     } catch (JSchException e) {
       log.info("JSch Exception Caught....");
       e.printStackTrace();
@@ -95,30 +96,30 @@ public class MySqlUtility {
       e.printStackTrace();
     }
 
-    //MY SQL DATA BASE CONNECTIVITY
+    // MY SQL DATA BASE CONNECTIVITY
     try {
 
-      //Register  driver class - This is not mandatory with the most recent JDBC drivers
+      // Register  driver class - This is not mandatory with the most recent JDBC drivers
       Class.forName("com.mysql.cj.jdbc.Driver");
 
-      //Create Connection
-      //log.trace("Getting Connection -"+"jdbc:mysql://localhost:"+LOCALPORT);
+      // Create Connection
+      // log.trace("Getting Connection -"+"jdbc:mysql://localhost:"+LOCALPORT);
       connection =
           DriverManager.getConnection(
               "jdbc:mysql://localhost:" + LOCALPORT + "/" + DATABASE, DB_USERNAME, DB_PASSWORD);
 
-      //log.trace("IS DATA BASE CONNECTION ClOSED -"+ connection.isClosed());
+      // log.trace("IS DATA BASE CONNECTION ClOSED -"+ connection.isClosed());
 
-      //Create Statement Object
+      // Create Statement Object
       Statement stmt = connection.createStatement();
-      //log.trace("Established DB Connection....");
+      // log.trace("Established DB Connection....");
 
-      //Execute query and capture result set
+      // Execute query and capture result set
       log.debug("Executing Query....");
       log.debug(dbQuery);
       ResultSet rs = stmt.executeQuery(dbQuery);
 
-      //Processing result - storing each row as an element in arraylist.
+      // Processing result - storing each row as an element in arraylist.
       while (rs.next()) {
         StringBuilder sb = new StringBuilder();
         ResultSetMetaData rsmd = rs.getMetaData();
@@ -133,9 +134,9 @@ public class MySqlUtility {
         dbResult.add(rowdata);
       }
 
-      //closing connection object ResultSet will be closed automatically
+      // closing connection object ResultSet will be closed automatically
       connection.close();
-      //log.trace("Closing Database Connection");
+      // log.trace("Closing Database Connection");
 
     } catch (SQLException e) {
       log.info("SQL Exception Caught....");
@@ -143,10 +144,10 @@ public class MySqlUtility {
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
-      //Terminate db connection
+      // Terminate db connection
       try {
         if (connection != null && !connection.isClosed()) {
-          //log.trace("Closed Database Connection");
+          // log.trace("Closed Database Connection");
           connection.close();
         }
       } catch (SQLException e) {
@@ -154,7 +155,7 @@ public class MySqlUtility {
       }
 
       if (session != null && session.isConnected()) {
-        //log.trace("Closing SSH Connection");
+        // log.trace("Closing SSH Connection");
         session.disconnect();
       }
     }

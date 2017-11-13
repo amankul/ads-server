@@ -1,7 +1,6 @@
 package com.phunware.ads.tests;
 
 import com.phunware.ads.utilities.*;
-import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
@@ -10,349 +9,451 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static io.restassured.RestAssured.given;
-
 public class Targeting {
 
+  // Initiating Logger Object
+  private static final Logger log = LogManager.getLogger();
 
-    //Initiating Logger Object
-    private static final Logger log = LogManager.getLogger();
+  private static String creativeID;
+  private static String campaignID;
+  private static String lineItemID;
+  private static String placementID;
+  private static String data;
+  private static String impressionURL;
+  private static String clickURL;
+  private static String winNotifyUrl;
 
-    private static String creativeID;
-    private static String campaignID;
-    private static String lineItemID;
-    private static String placementID;
-    private static String data;
+  @BeforeClass(alwaysRun = true)
+  @Parameters({
+    "serviceEndPoint",
+    "auth",
+    "runtimeEndPoint",
+    "campaignRequestEndPoint",
+    "lineItemRequestEndPoint",
+    "creativeRequestEndPoint",
+    "placementRequestEndPoint"
+  })
+  public void preTestSteps(
+      String serviceEndPoint,
+      String auth,
+      String runtimeEndPoint,
+      String campaignRequestEndPoint,
+      String lineItemRequestEndPoint,
+      String creativeRequestEndPoint,
+      String placementRequestEndPoint) {
 
+    // invoke data generator - forcing sync - cleaning up existing data.
+    ServerRequestUtility.invokeDataGenerator(serviceEndPoint, auth);
 
+    // create Campaign, LineItem & Placement & Creative
+    creativeID = CreativeUtility.createCreative(serviceEndPoint, auth, creativeRequestEndPoint);
+    campaignID = CampaignUtility.createCampaign(serviceEndPoint, auth, campaignRequestEndPoint);
+    lineItemID =
+        LineItemUtility.createLineItem(serviceEndPoint, auth, lineItemRequestEndPoint, campaignID);
+    placementID =
+        PlacementUtility.createPlacement(
+            serviceEndPoint, auth, placementRequestEndPoint, creativeID, lineItemID);
 
-    @BeforeClass(alwaysRun = true)
-    @Parameters({"serviceEndPoint", "auth", "runtimeEndPoint", "campaignRequestEndPoint", "lineItemRequestEndPoint", "creativeRequestEndPoint", "placementRequestEndPoint"})
-    public void preTestSteps(String serviceEndPoint, String auth, String runtimeEndPoint, String campaignRequestEndPoint, String lineItemRequestEndPoint, String creativeRequestEndPoint, String placementRequestEndPoint) {
+    // Update earlier created Campaign, Line Item & Placement to Scheduled  - `500 status ID`
+    CampaignUtility.updateCampaign(
+        serviceEndPoint, campaignRequestEndPoint, auth, campaignID, "500");
+    LineItemUtility.updateLineItem(
+        serviceEndPoint, lineItemRequestEndPoint, auth, lineItemID, "500");
+    PlacementUtility.updatePlacement(
+        serviceEndPoint, placementRequestEndPoint, auth, placementID, "500");
 
-        //create Campaign, LineItem & Placement & Creative
-        creativeID = CreativeUtility.createCreative(serviceEndPoint, auth, creativeRequestEndPoint);
-        campaignID = CampaignUtility.createCampaign(serviceEndPoint, auth, campaignRequestEndPoint);
-        lineItemID = LineItemUtility.createLineItem(serviceEndPoint, auth, lineItemRequestEndPoint, campaignID);
-        placementID = PlacementUtility.createPlacement(serviceEndPoint, auth, placementRequestEndPoint, creativeID, lineItemID);
+    // waiting for DG
+    ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
 
-        //Update earier created Campaign, Line Item & Placement to Scheduled  - `500 status ID`
-        CampaignUtility.updateCampaign(serviceEndPoint, campaignRequestEndPoint, auth, campaignID, "500");
-        LineItemUtility.updateLineItem(serviceEndPoint, lineItemRequestEndPoint, auth, lineItemID, "500");
-        PlacementUtility.updatePlacement(serviceEndPoint, placementRequestEndPoint, auth, placementID, "500");
-
-
-        //Waiting for the data generator to change status to 600 - Running
-        log.info("Waiting for the data generator, Giving it time to update status from scheduled to running : Wait Time 4 minutes");
-        wait(240);
-
-
-        //Change log4j2.xml logger level
-        AdsServerUtility.updateLog4jLoggingLevel(serviceEndPoint, "trace");
-        log.info("Log4j Log Level Updated");
-
-
-        //Waiting for the data generator to pick running placements
-        log.info("Waiting for the data generator, to pick up running placements :  Wait Time 4 minutes");
-        wait(240);
-
-        //invoke data generator
-        //invokeDataGenerator(serviceEndPoint,auth);
-
-        //POST REQUEST TO DSP SERVER, CAPTURE DATA
-        HashMap<String, String> result = ServerRequestUtility.postBidRequest(runtimeEndPoint);
-        Assert.assertTrue(result.size() == 3 , "Bid Request is not successful");
-        for(HashMap.Entry<String,String> entry:result.entrySet()){
-            log.info(entry.getKey()+ " -- "+entry.getValue());
-        }
-
-        //wait for log file to get populated
-        waitForLogsToGetPopulated(serviceEndPoint);
-
-        //Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
-        data = AdsServerUtility.logInToServerExecuteShellCommandAndReturnResponse(serviceEndPoint, "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep " + placementID);
-        writeToFile(data);
-
-        //Considering placement id 10306 for Country constraint
-        log.info("Captured log lines from abm-dsp-srv.log containing Placement ID - " + placementID);
-
+    // check placement status ID - if it is not 600 invoke data generator Again
+    if (PlacementUtility.getStatusId(serviceEndPoint, placementRequestEndPoint, auth, placementID)
+        != 600) {
+      // waiting for DG
+      ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
+      //      log.info("Invoking the data generator again as placement status is not 600 (running)
+      // ");
+      //      ServerRequestUtility.invokeDataGenerator(serviceEndPoint, auth);
+      //      log.info("Waiting for the data generator Again, Giving it time to update status : Wait
+      // Time 4 minutes");
+      //      ServerRequestUtility.wait(240);
     }
 
-    @AfterClass(alwaysRun = true)
-    @Parameters({"serviceEndPoint", "auth", "campaignRequestEndPoint", "lineItemRequestEndPoint", "creativeRequestEndPoint", "placementRequestEndPoint"})
-    public void postTestSteps(String serviceEndPoint, String auth, String campaignRequestEndPoint, String lineItemRequestEndPoint, String creativeRequestEndPoint, String placementRequestEndPoint)
+    // Change log4j2.xml logger level
+    AdsServerUtility.updateLog4jLoggingLevel(serviceEndPoint, "trace");
+    log.info("Log4j Log Level Updated");
 
-    {
-        //delete Campaign, LineItem & Placement & Creative
-        CampaignUtility.deleteCampaign(serviceEndPoint, campaignRequestEndPoint, auth, campaignID);
-        LineItemUtility.deleteLineItem(serviceEndPoint, lineItemRequestEndPoint, auth, lineItemID);
-        CreativeUtility.deleteCreative(serviceEndPoint, creativeRequestEndPoint, auth, creativeID);
-        PlacementUtility.deletePlacement(serviceEndPoint, placementRequestEndPoint, auth, placementID);
+    // POST REQUEST TO DSP SERVER, CAPTURE DATA
+    HashMap<String, String> result =
+        ServerRequestUtility.postBidRequest(runtimeEndPoint, "runTimeRequest.json");
+    Assert.assertTrue(result.size() == 3, "Bid Request is not successful");
+    for (HashMap.Entry<String, String> entry : result.entrySet()) {
+      if (entry.getKey().equals("impressionURL")) {
+        impressionURL = entry.getValue();
+        log.info("IMPRESSION URL " + " -- " + impressionURL);
+      }
+      if (entry.getKey().equals("clickURL")) {
+        clickURL = entry.getValue();
+        log.info("CLICK URL " + " -- " + clickURL);
+      }
+      if (entry.getKey().equals("winNotifyUrl")) {
+        winNotifyUrl = entry.getValue();
+        log.info("WIN NOTIFY URL " + " -- " + winNotifyUrl);
+      }
     }
 
-
-    // ================================== PLACEMENT CONSTRAINTS ============================================= //
-
-    @Test(priority = 1)
-    public void verifyCountryConstraint() {
-        placementConstraintValidator("CountryConstraint");
-    }
-
-    @Test(priority = 2)
-    public void verifyRegionConstraint() {
-        placementConstraintValidator("RegionConstraint");
-    }
-
-    @Test(priority = 3)
-    public void verifyDMAConstraint() {
-        placementConstraintValidator("DMAConstraint");
-    }
-
-    @Test(priority = 4)
-    public void verifyCityConstraint() {
-        placementConstraintValidator("CityConstraint");
-    }
-
-    @Test(priority = 5)
-    public void verifyZipConstraint() {
-        placementConstraintValidator("ZipConstraint");
-    }
-
-    @Test(priority = 6)
-    public void verifyCarrierConstraint() {
-        placementConstraintValidator("CarrierConstraint");
-    }
-
-    @Test(priority = 7)
-    public void verifyLanguageConstraint() {
-        placementConstraintValidator("LanguageConstraint");
-    }
-
-    @Test(priority = 8)
-    public void verifyDeviceConstraint() {
-        placementConstraintValidator("DeviceConstraint");
-    }
-
-    @Test(priority = 9)
-    public void verifyDeviceTypeConstraint() {
-        placementConstraintValidator("DeviceTypeConstraint");
-    }
-
-    @Test(priority = 10)
-    public void verifyBrandConstraint() {
-        placementConstraintValidator("BrandConstraint");
-    }
-
-    @Test(priority = 11)
-    public void verifyHyperLocalConstraint() {
-        placementConstraintValidator("HyperLocalConstraint");
-    }
-
-    @Test(priority = 12)
-    public void verifyOSConstraint() {
-        placementConstraintValidator("OSConstraint");
-    }
-
-    @Test(priority = 13)
-    public void verifyGenderConstraint() {
-        placementConstraintValidator("GenderConstraint");
-    }
-
-    @Test(priority = 14)
-    public void verifyDeviceIdConstraint() {
-        placementConstraintValidator("DeviceIdConstraint");
-    }
-
-    @Test(priority = 15)
-    public void verifyeCPCOptimizationTargetConstraint() {
-        placementConstraintValidator("eCPCOptimizationTargetConstraint");
-    }
-
-    @Test(priority = 16)
-    public void verifyBlockedAdvertiserConstraint() {
-        placementConstraintValidator("BlockedAdvertiserConstraint");
-    }
-
-    @Test(priority = 17)
-    public void verifyBlockedCategoryConstraint() {
-        placementConstraintValidator("BlockedCategoryConstraint");
-    }
-
-    @Test(priority = 18)
-    public void verifyScheduleConstraint() {
-        placementConstraintValidator("ScheduleConstraint");
-    }
-
-    @Test(priority = 19)
-    public void verifyPmpConstraint() {
-        placementConstraintValidator("PmpConstraint");
-    }
-
-    @Test(priority = 20)
-    public void verifyTrafficSourceConstraint() {
-        placementConstraintValidator("TrafficSourceConstraint");
-    }
-
-    @Test(priority = 21)
-    public void verifyBundleIdConstraint() {
-        placementConstraintValidator("BundleIdConstraint");
-    }
-
-    @Test(priority = 22)
-    public void verifyDomainConstraint() {
-        placementConstraintValidator("DomainConstraint");
-    }
-
-
-    @Test(priority = 23)
-    public void verifyDeviceFrequencyCapConstraint() {
-        placementConstraintValidator("DeviceFrequencyCapConstraint");
-    }
-
-    @Test(priority = 24)
-    public void verifyBudgetConstraint() {
-        placementConstraintValidator("BudgetConstraint");
-    }
-
-    @Test(priority = 25)
-    public void verifyTargetConstraint() {
-        placementConstraintValidator("TargetConstraint");
-    }
-
-    @Test(priority = 26)
-    public void verifyBidFloorConstraint() {
-        placementConstraintValidator("BidFloorConstraint");
-    }
-
-
-    // ================================== CREATIVE CONSTRAINTS ============================================= //
-
-
-    @Test(priority = 27)
-    public void verifyBattrConstraint() {
-        creativeConstraintValidator("BattrConstraint");
-    }
-
-    @Test(priority = 28)
-    public void verifyBtypeConstraint() {
-        creativeConstraintValidator("BtypeConstraint");
-    }
-
-    @Test(priority = 29)
-    public void verifyDimensionTypeConstraint() {
-        creativeConstraintValidator("DimensionTypeConstraint");
-    }
-
-    @Test(priority = 30)
-    public void verifyMimeTypeConstraint() {
-        creativeConstraintValidator("MimeTypeConstraint");
-    }
-
-    @Test(priority = 31)
-    public void verifySecureConstraint() {
-        creativeConstraintValidator("SecureConstraint");
-    }
-
-
-    // ================================== UTILITY METHODS ============================================= //
-
-
-    public static void placementConstraintValidator(String regexSubString) {
-
-        // Validating presence of "Placement: `placementID` Constraint: `constraint name` is valid" in abm-dsp-srv.log file
-
-        String regex = ".+?- (Placement.*?:.*?" + placementID + ".*?Constraint: " + regexSubString + " is valid)";
-        Matcher regexMatcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(data);
-
-        Assert.assertTrue(regexMatcher.find(), "Could not find pattern `" + regex + "` in the file abm-dsp-srv.txt");
-
-        log.info(regexSubString + " passed, `abm-dsp-srv.log` Contains: ");
-        log.info(regexMatcher.group(1));
-
-    }
-
-    public static void creativeConstraintValidator(String regexSubString) {
-
-        // Validating presence of "CreativeConstraint: `constraint name` for Placement id: `placementID`, Creative id: `creativeID` is VALID"
-
-        String regex = ".+?(CreativeConstraint.*?:.*?" + regexSubString + ".*?Placement id:.*?" + placementID + ".*?Creative id:.*?" + creativeID + ".*?is VALID)";
-        Matcher regexMatcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(data);
-
-        Assert.assertTrue(regexMatcher.find(), "Could not find pattern `" + regex + "` in the file abm-dsp-srv.txt");
-
-        log.info(regexSubString + " passed, `abm-dsp-srv.log` Contains: ");
-        log.info(regexMatcher.group(1));
-
-    }
-
-
-    public static void writeToFile(String data) {
-
-        try {
-            File myFile = new File(System.getProperty("user.dir") + "/src/main/resources/abm-dsp-srv.txt");
-            FileOutputStream pemFileStream = new FileOutputStream(myFile, false);
-            pemFileStream.write(data.getBytes());
-            pemFileStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void wait(int timeInSeconds) {
-        try {
-            Thread.sleep(timeInSeconds * 1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void waitForLogsToGetPopulated(String serviceEndPoint){
-
-        int retry = 12;
-        int count=0;
-        String size = "";
-
-        while (retry >= count) {
-            log.info("Waiting for abm-dsp-srv.log to get populated with constraint data ..");
-            wait(5);
-            //looking for String "Considering placement id `placementID` for Country constraint"
-            size = AdsServerUtility.logInToServerExecuteShellCommandAndReturnResponse(serviceEndPoint, "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep " + "\"Considering placement id " +placementID +" for Country constraint\"");
-            count++;
-            if (size.length()>10){
-                break;
-            }
-        }
-    }
-
-    public static void invokeDataGenerator(String serviceEndPoint , String auth ){
-
-        String requestURL = serviceEndPoint +"/api/v1.0/datagenerator";
-
-        //Printing Request Details
-        log.debug("REQUEST-URL:POST-" + requestURL);
-
-        //Extracting response after status code validation
-        Response response =
-                given()
-                        .header("Authorization", auth)
-                        .request()
-                        .get(requestURL)
-                        .then()
-                        .statusCode(200)
-                        .extract()
-                        .response();
-
-        //printing response
-        log.info("RESPONSE:" + response.asString());
-        log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
-
-
-    }
-
+    // wait for log file to get populated
+    ServerRequestUtility.waitForLogsToGetPopulated(
+        serviceEndPoint,
+        "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep "
+            + "\"Considering placement id "
+            + placementID
+            + " for Country constraint\"");
+
+    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
+    data =
+        AdsServerUtility.logInToServerExecuteShellCommandAndReturnResponse(
+            serviceEndPoint, "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep " + placementID);
+    ServerRequestUtility.writeToFile(
+        data, System.getProperty("user.dir") + "/src/main/resources/abm-dsp-srv.txt");
+
+    log.info("Captured log lines from abm-dsp-srv.log containing Placement ID - " + placementID);
+  }
+
+  @AfterClass(alwaysRun = true)
+  @Parameters({
+    "serviceEndPoint",
+    "auth",
+    "campaignRequestEndPoint",
+    "lineItemRequestEndPoint",
+    "creativeRequestEndPoint",
+    "placementRequestEndPoint"
+  })
+  public void postTestSteps(
+      String serviceEndPoint,
+      String auth,
+      String campaignRequestEndPoint,
+      String lineItemRequestEndPoint,
+      String creativeRequestEndPoint,
+      String placementRequestEndPoint) {
+
+    // Save created ID's in a property file
+    ServerRequestUtility.writePropertyFile(
+        "campaignId",
+        campaignID,
+        "lineItemId",
+        lineItemID,
+        "placementId",
+        placementID,
+        "creativeId",
+        creativeID,
+        System.getProperty("user.dir") + "/src/main/resources/runTimeData.Properties");
+
+    // Save Impression Url, Click URl, WinNotify URL & No of times ImpressionURL is supposed to be
+    // hit.
+    ServerRequestUtility.writePropertyFile(
+        "impressionURL",
+        impressionURL,
+        "clickURL",
+        clickURL,
+        "winNotifyURL",
+        winNotifyUrl,
+        "noOfHitsImpressionURL",
+        "10",
+        System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties");
+  }
+
+  // ================================== PLACEMENT CONSTRAINTS  ============================================= //
+
+  /*
+  Verify successful Country Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 1)
+  public void verifyCountryConstraint() {
+    placementConstraintValidator("CountryConstraint");
+  }
+
+  /*
+  Verify successful Region Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 2)
+  public void verifyRegionConstraint() {
+    placementConstraintValidator("RegionConstraint");
+  }
+
+  /*
+  Verify successful DMA Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 3)
+  public void verifyDMAConstraint() {
+    placementConstraintValidator("DMAConstraint");
+  }
+
+  /*
+  Verify successful City Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 4)
+  public void verifyCityConstraint() {
+    placementConstraintValidator("CityConstraint");
+  }
+
+  /*
+  Verify successful Zip Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 5)
+  public void verifyZipConstraint() {
+    placementConstraintValidator("ZipConstraint");
+  }
+
+  /*
+  Verify successful Carrier Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 6)
+  public void verifyCarrierConstraint() {
+    placementConstraintValidator("CarrierConstraint");
+  }
+
+  /*
+  Verify successful Language Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 7)
+  public void verifyLanguageConstraint() {
+    placementConstraintValidator("LanguageConstraint");
+  }
+
+  /*
+  Verify successful Device Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 8)
+  public void verifyDeviceConstraint() {
+    placementConstraintValidator("DeviceConstraint");
+  }
+
+  /*
+  Verify successful DeviceType Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 9)
+  public void verifyDeviceTypeConstraint() {
+    placementConstraintValidator("DeviceTypeConstraint");
+  }
+
+  /*
+  Verify successful Brand Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 10)
+  public void verifyBrandConstraint() {
+    placementConstraintValidator("BrandConstraint");
+  }
+
+  /*
+  Verify successful Hyper Local Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 11)
+  public void verifyHyperLocalConstraint() {
+    placementConstraintValidator("HyperLocalConstraint");
+  }
+
+  /*
+  Verify successful OS Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 12)
+  public void verifyOSConstraint() {
+    placementConstraintValidator("OSConstraint");
+  }
+
+  /*
+  Verify successful Gender Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 13)
+  public void verifyGenderConstraint() {
+    placementConstraintValidator("GenderConstraint");
+  }
+
+  /*
+  Verify successful DevideID Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 14)
+  public void verifyDeviceIdConstraint() {
+    placementConstraintValidator("DeviceIdConstraint");
+  }
+
+  /*
+  Verify successful CPC Optimization Target Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 15)
+  public void verifyeCPCOptimizationTargetConstraint() {
+    placementConstraintValidator("eCPCOptimizationTargetConstraint");
+  }
+
+  /*
+  Verify successful Blocked Advertiser Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 16)
+  public void verifyBlockedAdvertiserConstraint() {
+    placementConstraintValidator("BlockedAdvertiserConstraint");
+  }
+
+  /*
+  Verify successful Blocked Category Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 17)
+  public void verifyBlockedCategoryConstraint() {
+    placementConstraintValidator("BlockedCategoryConstraint");
+  }
+
+  /*
+  Verify successful Schedule Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 18)
+  public void verifyScheduleConstraint() {
+    placementConstraintValidator("ScheduleConstraint");
+  }
+
+  /*
+  Verify successful PMP Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 19)
+  public void verifyPmpConstraint() {
+    placementConstraintValidator("PmpConstraint");
+  }
+
+  /*
+  Verify successful TrafficSource Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 20)
+  public void verifyTrafficSourceConstraint() {
+    placementConstraintValidator("TrafficSourceConstraint");
+  }
+
+  /*
+  Verify successful BundleId Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 21)
+  public void verifyBundleIdConstraint() {
+    placementConstraintValidator("BundleIdConstraint");
+  }
+
+  /*
+  Verify successful Domain Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 22)
+  public void verifyDomainConstraint() {
+    placementConstraintValidator("DomainConstraint");
+  }
+
+  /*
+  Verify successful DeviceFrequency Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 23)
+  public void verifyDeviceFrequencyCapConstraint() {
+    placementConstraintValidator("DeviceFrequencyCapConstraint");
+  }
+
+  /*
+  Verify successful Budget Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 24)
+  public void verifyBudgetConstraint() {
+    placementConstraintValidator("BudgetConstraint");
+  }
+
+  /*
+  Verify successful Target Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 25)
+  public void verifyTargetConstraint() {
+    placementConstraintValidator("TargetConstraint");
+  }
+
+  /*
+  Verify successful Bid Floor Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 26)
+  public void verifyBidFloorConstraint() {
+    placementConstraintValidator("BidFloorConstraint");
+  }
+
+  // ================================== CREATIVE CONSTRAINTS  ============================================= //
+  /*
+  Verify successful battr Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 27)
+  public void verifyBattrConstraint() {
+    creativeConstraintValidator("BattrConstraint");
+  }
+
+  /*
+  Verify successful Btype Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 28)
+  public void verifyBtypeConstraint() {
+    creativeConstraintValidator("BtypeConstraint");
+  }
+
+  /*
+  Verify successful Dimension Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 29)
+  public void verifyDimensionTypeConstraint() {
+    creativeConstraintValidator("DimensionTypeConstraint");
+  }
+
+  /*
+  Verify successful MimeType Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 30)
+  public void verifyMimeTypeConstraint() {
+    creativeConstraintValidator("MimeTypeConstraint");
+  }
+
+  /*
+  Verify successful Secure Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
+  */
+  @Test(priority = 31)
+  public void verifySecureConstraint() {
+    creativeConstraintValidator("SecureConstraint");
+  }
+
+  // ================================== UTILITY METHODS ============================================= //
+
+  public static void placementConstraintValidator(String regexSubString) {
+
+    // Validating presence of "Placement: `placementID` Constraint: `constraint name` is valid" in
+    // abm-dsp-srv.log file
+
+    String regex =
+        ".+?- (Placement.*?:.*?" + placementID + ".*?Constraint: " + regexSubString + " is valid)";
+    Matcher regexMatcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(data);
+
+    Assert.assertTrue(
+        regexMatcher.find(), "Could not find pattern `" + regex + "` in the file abm-dsp-srv.txt");
+
+    log.info(regexSubString + " passed, `abm-dsp-srv.log` Contains: ");
+    log.info(regexMatcher.group(1));
+  }
+
+  public static void creativeConstraintValidator(String regexSubString) {
+
+    // Validating presence of "CreativeConstraint: `constraint name` for Placement id:
+    // `placementID`, Creative id: `creativeID` is VALID"
+
+    String regex =
+        ".+?(CreativeConstraint.*?:.*?"
+            + regexSubString
+            + ".*?Placement id:.*?"
+            + placementID
+            + ".*?Creative id:.*?"
+            + creativeID
+            + ".*?is VALID)";
+    Matcher regexMatcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(data);
+
+    Assert.assertTrue(
+        regexMatcher.find(), "Could not find pattern `" + regex + "` in the file abm-dsp-srv.txt");
+
+    log.info(regexSubString + " passed, `abm-dsp-srv.log` Contains: ");
+    log.info(regexMatcher.group(1));
+  }
 }

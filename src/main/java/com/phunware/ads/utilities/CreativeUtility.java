@@ -11,122 +11,117 @@ import static io.restassured.RestAssured.given;
 
 public class CreativeUtility {
 
-    //Initiating Logger Object
-    private static final Logger log = LogManager.getLogger();
-    private static String randomvalue;
-    private static String creativeID;
-    private static ArrayList<String> dbResult;
-    private static String advertiserId;
-//    private static String creativeTypeId;
-//    private static String clickurl;
-//    private static String iurlS3AssetId;
-//    private static String s3Asset;
+  // Initiating Logger Object
+  private static final Logger log = LogManager.getLogger();
+  private static String randomvalue;
+  private static String creativeID;
+  private static ArrayList<String> dbResult;
+  private static String advertiserId;
 
-    public static String createCreative(String serviceEndPoint, String auth, String creativeRequestEndPoint) {
+  public static String createCreative(
+      String serviceEndPoint, String auth, String creativeRequestEndPoint) {
 
-        initializeData(serviceEndPoint);
+    initializeData(serviceEndPoint);
 
-        //Request Details
-        String requestURL = serviceEndPoint + creativeRequestEndPoint;
-        String requestBody =
-                JsonUtilities.jsonToString(
-                        System.getProperty("user.dir")
-                                + "/src/main/java/com/phunware/ads/json/creative.json")
-                        .replaceAll("advertiserIdToBeChanged", advertiserId)
-                        .replaceAll("nameToBeChanged", randomvalue);
+    // Request Details
+    String requestURL = serviceEndPoint + creativeRequestEndPoint;
+    String requestBody =
+        JsonUtilities.jsonToString(
+                System.getProperty("user.dir")
+                    + "/src/main/java/com/phunware/ads/json/creative.json")
+            .replaceAll("advertiserIdToBeChanged", advertiserId)
+            .replaceAll("nameToBeChanged", randomvalue);
 
+    // Printing Request Details
+    log.debug("REQUEST-URL:POST-" + requestURL);
+    log.debug("REQUEST-BODY:" + requestBody);
 
-        //Printing Request Details
-        log.debug("REQUEST-URL:POST-" + requestURL);
-        log.debug("REQUEST-BODY:" + requestBody);
+    // Extracting response after status code validation
+    Response response =
+        given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", auth)
+            .request()
+            .body(requestBody)
+            .post(requestURL)
+            .then()
+            .statusCode(201)
+            .extract()
+            .response();
 
-        //Extracting response after status code validation
-        Response response =
-                given()
-                        .header("Content-Type", "application/json")
-                        .header("Authorization", auth)
-                        .request()
-                        .body(requestBody)
-                        .post(requestURL)
-                        .then()
-                        .statusCode(201)
-                        .extract()
-                        .response();
+    // printing response
+    log.debug("RESPONSE:" + response.asString());
+    log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
 
-        //printing response
-        log.debug("RESPONSE:" + response.asString());
-        log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
+    // capturing created lineItem ID
+    creativeID = response.then().extract().path("data.id").toString();
+    log.info("Created New Creative - ID - " + creativeID);
 
-        //capturing created lineItem ID
-        creativeID = response.then().extract().path("data.id").toString();
-        log.info("Created New Creative - ID - " + creativeID);
+    return creativeID;
+  }
 
-        return creativeID;
-    }
+  public static void deleteCreative(
+      String serviceEndPoint, String creativeRequestEndPoint, String auth, String creativeID) {
 
+    // Request Details
+    String requestURL = serviceEndPoint + creativeRequestEndPoint + "/" + creativeID;
 
-    public static void deleteCreative(String serviceEndPoint, String creativeRequestEndPoint, String auth, String creativeID) {
+    // Printing Request Details
+    log.debug("REQUEST-URL:DELETE-" + requestURL);
 
+    // Extracting response after status code validation
+    Response response =
+        given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", auth)
+            .request()
+            .delete(requestURL)
+            .then()
+            .statusCode(200)
+            .extract()
+            .response();
 
-        //Request Details
-        String requestURL = serviceEndPoint + creativeRequestEndPoint + "/" + creativeID;
+    log.info("Deleted Creative ID - " + creativeID);
+  }
 
-        //Printing Request Details
-        log.debug("REQUEST-URL:DELETE-" + requestURL);
+  public static void updateCreative(
+      String serviceEndPoint,
+      String creativeRequestEndPoint,
+      String auth,
+      String creativeID,
+      String statusID) {
 
-        //Extracting response after status code validation
-        Response response =
-                given()
-                        .header("Content-Type", "application/json")
-                        .header("Authorization", auth)
-                        .request()
-                        .delete(requestURL)
-                        .then()
-                        .statusCode(200)
-                        .extract()
-                        .response();
+    // Request Details
+    String requestURL = serviceEndPoint + creativeRequestEndPoint + "/" + creativeID;
 
-        log.info("Deleted Creative ID - " + creativeID);
-    }
+    // Printing Request Details
+    log.debug("REQUEST-URL:PUT-" + requestURL);
 
+    // Extracting response after status code validation
+    Response response =
+        given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", auth)
+            .request()
+            .body("{\"statusId\": " + statusID + "}")
+            .put(requestURL)
+            .then()
+            .statusCode(200)
+            .extract()
+            .response();
 
-    public static void updateCreative(String serviceEndPoint, String creativeRequestEndPoint, String auth, String creativeID, String statusID) {
+    log.info("Updated Creative ID - " + creativeID + ", Status to Running - " + statusID);
+  }
 
-        //Request Details
-        String requestURL = serviceEndPoint + creativeRequestEndPoint + "/" + creativeID;
+  public static void initializeData(String serviceEndPoint) {
 
-        //Printing Request Details
-        log.debug("REQUEST-URL:PUT-" + requestURL);
+    randomvalue = "Creative" + LocalDateTime.now().toString().replaceAll("[-:.T]", "");
 
-        //Extracting response after status code validation
-        Response response =
-                given()
-                        .header("Content-Type", "application/json")
-                        .header("Authorization", auth)
-                        .request()
-                        .body("{\"statusId\": " + statusID + "}")
-                        .put(requestURL)
-                        .then()
-                        .statusCode(200)
-                        .extract()
-                        .response();
-
-        log.info("Updated Creative ID - " + creativeID + ", Status to Running - "+statusID);
-
-    }
-
-
-    public static void initializeData(String serviceEndPoint) {
-
-        randomvalue = "Creative" + LocalDateTime.now().toString().replaceAll("[-:.T]", "");
-
-        //Capturing advertiserId from DB
-        String sqlQuery = "select id from advertiser where is_active = 1 limit 1";
-        dbResult = MySqlUtility.query_Post_connection_To_MySQL_Via_JumpServer(sqlQuery, serviceEndPoint);
-        advertiserId = dbResult.get(0);
-        dbResult.clear();
-
-    }
-
-
+    // Capturing advertiserId from DB
+    String sqlQuery = "select id from advertiser where is_active = 1 limit 1";
+    dbResult =
+        MySqlUtility.query_Post_connection_To_MySQL_Via_JumpServer(sqlQuery, serviceEndPoint);
+    advertiserId = dbResult.get(0);
+    dbResult.clear();
+  }
 }
