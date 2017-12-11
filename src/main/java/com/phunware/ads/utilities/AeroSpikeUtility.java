@@ -31,7 +31,7 @@ public class AeroSpikeUtility {
   private static Session aerospikeserverSession;
 
   // Initiating Logger Object
-  private static final Logger log = LogManager.getLogger();
+  private static final Logger LOG = LogManager.getLogger();
 
   public static void initialize(String env) {
 
@@ -84,7 +84,7 @@ public class AeroSpikeUtility {
       jumpServerSession.setPassword(jumpServerSshPassword);
       jumpServerSession.setConfig(config);
       jumpServerSession.connect(15000);
-      log.info("SSH Connected - connected to jump server - " + jumpServerSshHostName);
+      LOG.info("SSH Connected - connected to jump server - " + jumpServerSshHostName);
 
       // Change the port number if the port is already used.
       int localPort = 17242;
@@ -116,7 +116,7 @@ public class AeroSpikeUtility {
       aerospikeserverSession = jsch.getSession(aerospikeserverUser, "localhost", assingedPort);
       aerospikeserverSession.setConfig(config);
       aerospikeserverSession.connect(15000);
-      log.info("SSH Connected - connected to server - " + aerospikeserverHostName);
+      LOG.info("SSH Connected - connected to server - " + aerospikeserverHostName);
 
       // Change the port number if the port is already used.
       int localPortAerospike = 17243;
@@ -134,9 +134,9 @@ public class AeroSpikeUtility {
       aerospikeResult = record.toString();
       client.close();
 
-      log.info("SSH Sessions Getting Disconnected - No Exceptions Observed");
+      LOG.info("SSH Sessions Getting Disconnected - No Exceptions Observed");
     } catch (Exception ee) {
-      log.info("SSH Sessions Getting Disconnected - Exception observed");
+      LOG.info("SSH Sessions Getting Disconnected - Exception observed");
       ee.printStackTrace();
     } finally {
       aerospikeserverSession.disconnect();

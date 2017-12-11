@@ -13,7 +13,7 @@ import static io.restassured.RestAssured.given;
 public class CampaignUtility {
 
   // Initiating Logger Object
-  private static final Logger log = LogManager.getLogger();
+  private static final Logger LOG = LogManager.getLogger();
   private static String randomvalue;
   private static String campaignID;
   private static ArrayList<String> dbResult;
@@ -40,8 +40,8 @@ public class CampaignUtility {
             .replaceAll("endDateToBeChanged", endDate);
 
     // Printing Request Details
-    log.debug("REQUEST-URL:POST-" + requestURL);
-    log.debug("REQUEST-BODY:" + requestBody);
+    LOG.debug("REQUEST-URL:POST-" + requestURL);
+    LOG.debug("REQUEST-BODY:" + requestBody);
 
     // Extracting response after status code validation
     Response response =
@@ -57,12 +57,12 @@ public class CampaignUtility {
             .response();
 
     // printing response
-    log.debug("RESPONSE:" + response.asString());
-    log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
+    LOG.debug("RESPONSE:" + response.asString());
+    LOG.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
 
     // capturing campaign ID
     campaignID = response.then().extract().path("data.id").toString();
-    log.info("Created New Campaign - ID - " + campaignID);
+    LOG.info("Created New Campaign - ID - " + campaignID);
 
     return campaignID;
   }
@@ -85,7 +85,7 @@ public class CampaignUtility {
         .extract()
         .response();
 
-    log.info("Deleted Campaign ID - " + campaignID);
+    LOG.info("Deleted Campaign ID - " + campaignID);
   }
 
   public static void updateCampaign(
@@ -111,7 +111,7 @@ public class CampaignUtility {
             .extract()
             .response();
 
-    log.info("Updated Campaign ID - " + campaignID + ", Status Updated to - " + statusID);
+    LOG.info("Updated Campaign ID - " + campaignID + ", Status Updated to - " + statusID);
   }
 
   public static void updateCampaignUsingRequestBody(
@@ -137,7 +137,7 @@ public class CampaignUtility {
             .extract()
             .response();
 
-    log.info("Updated Campaign ID - " + campaignID);
+    LOG.info("Updated Campaign ID - " + campaignID);
   }
 
   public static int getAdvertiserID(String serviceEndPoint) {

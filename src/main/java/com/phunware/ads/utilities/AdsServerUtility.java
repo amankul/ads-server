@@ -25,7 +25,7 @@ public class AdsServerUtility {
   private static Session serverSession;
 
   // Initiating Logger Object
-  private static final Logger log = LogManager.getLogger();
+  private static final Logger LOG = LogManager.getLogger();
 
   public static void initialize(String env) {
 
@@ -65,7 +65,7 @@ public class AdsServerUtility {
 
     initialize(serviceEndPoint);
     String output = "";
-    log.info("Executing Shell Command - " + shellCommand);
+    LOG.info("Executing Shell Command - " + shellCommand);
 
     try {
       java.util.Properties config = new java.util.Properties();
@@ -78,7 +78,7 @@ public class AdsServerUtility {
       jumpServerSession.setPassword(jumpServerSshPassword);
       jumpServerSession.setConfig(config);
       jumpServerSession.connect();
-      log.debug("SSH Connected - connected to jump server - " + jumpServerSshHostName);
+      LOG.debug("SSH Connected - connected to jump server - " + jumpServerSshHostName);
 
       // Change the port number if the port is already used.
       int localPort = 15006;
@@ -109,7 +109,7 @@ public class AdsServerUtility {
       serverSession = jsch.getSession(serverUser, "localhost", assingedPort);
       serverSession.setConfig(config);
       serverSession.connect(30000);
-      log.debug("SSH Connected - connected to server - " + serverHostName);
+      LOG.debug("SSH Connected - connected to server - " + serverHostName);
 
       // Executing and printing shell commands
       Channel channel = serverSession.openChannel("exec");
@@ -128,14 +128,14 @@ public class AdsServerUtility {
           output = output + (new String(temp, 0, i));
         }
         if (channel.isClosed()) {
-          log.debug("exit-status: " + channel.getExitStatus());
+          LOG.debug("exit-status: " + channel.getExitStatus());
           break;
         }
       }
 
-      log.debug("SSH Sessions Getting Disconnected - No Exceptions Observed");
+      LOG.debug("SSH Sessions Getting Disconnected - No Exceptions Observed");
     } catch (Exception e) {
-      log.debug("SSH Sessions Getting Disconnected - Exception observed");
+      LOG.debug("SSH Sessions Getting Disconnected - Exception observed");
       e.printStackTrace();
     } finally {
       serverSession.disconnect();
@@ -157,7 +157,7 @@ public class AdsServerUtility {
     logInToServerExecuteShellCommandAndReturnResponse(
         serviceEndPoint,
         "sudo -u root /bin/cp /home/developer/Automation/log4j2.xml /opt/phunware/dsp/current/log4j2.xml");
-    log.info("Updated Logger level to - " + loggerLevel);
+    LOG.info("Updated Logger level to - " + loggerLevel);
   }
 
   public static void writeToFile(String data) {

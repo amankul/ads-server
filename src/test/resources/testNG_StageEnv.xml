@@ -4,6 +4,7 @@
 
     <parameter name="serviceEndPoint" value="https://dsp-api-stage.phunware.com"/>
     <parameter name="runtimeEndPoint" value="http://dsp-r-stage.phunware.com/bidRequest"/>
+
     <parameter name="auth"
                value="bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE0OTYxNzYyMzcsImV4cCI6MjIyMjAyMjYzNywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsIkdpdmVuTmFtZSI6IkpvaG5ueSIsIlN1cm5hbWUiOiJSb2NrZXQiLCJFbWFpbCI6Impyb2NrZXRAZXhhbXBsZS5jb20iLCJSb2xlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.SBq3542mu6olSrYmvGd6bZZo5XBId3J-QXWQGi2-d5Q"/>
     <parameter name="authExpired"
@@ -18,8 +19,10 @@
 
         <classes>
             <class name="com.phunware.ads.tests.Targeting"/>
-            <class name="com.phunware.ads.tests.CostAndSpend"/>
+            <class name="com.phunware.ads.tests.CostSpendAndEventLogging"/>
             <class name="com.phunware.ads.tests.Capping"/>
+            <class name="com.phunware.ads.tests.PrivateAuction"/>
+            <class name="com.phunware.ads.tests.GeneralRTBSpecRegression"/>
         </classes>
     </test>
 </suite>

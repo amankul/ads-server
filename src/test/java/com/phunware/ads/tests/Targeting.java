@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class Targeting {
 
   // Initiating Logger Object
-  private static final Logger log = LogManager.getLogger();
+  private static final Logger LOG = LogManager.getLogger();
 
   private static String creativeID;
   private static String campaignID;
@@ -26,6 +26,7 @@ public class Targeting {
   private static String impressionURL;
   private static String clickURL;
   private static String winNotifyUrl;
+  private static String transactionID;
 
   @BeforeClass(alwaysRun = true)
   @Parameters({
@@ -70,57 +71,58 @@ public class Targeting {
     ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
 
     // check placement status ID - if it is not 600 invoke data generator Again
-    if (PlacementUtility.getStatusId(serviceEndPoint, placementRequestEndPoint, auth, placementID)
+      if (PlacementUtility.getStatusId(serviceEndPoint, placementRequestEndPoint, auth, placementID)
         != 600) {
       // waiting for DG
       ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
-      //      log.info("Invoking the data generator again as placement status is not 600 (running)
-      // ");
-      //      ServerRequestUtility.invokeDataGenerator(serviceEndPoint, auth);
-      //      log.info("Waiting for the data generator Again, Giving it time to update status : Wait
-      // Time 4 minutes");
-      //      ServerRequestUtility.wait(240);
+
     }
 
     // Change log4j2.xml logger level
     AdsServerUtility.updateLog4jLoggingLevel(serviceEndPoint, "trace");
-    log.info("Log4j Log Level Updated");
+    LOG.info("Log4j Log Level Updated");
 
     // POST REQUEST TO DSP SERVER, CAPTURE DATA
     HashMap<String, String> result =
         ServerRequestUtility.postBidRequest(runtimeEndPoint, "runTimeRequest.json");
-    Assert.assertTrue(result.size() == 3, "Bid Request is not successful");
+    Assert.assertTrue(result.size() == 4, "Bid Request is not successful");
     for (HashMap.Entry<String, String> entry : result.entrySet()) {
       if (entry.getKey().equals("impressionURL")) {
         impressionURL = entry.getValue();
-        log.info("IMPRESSION URL " + " -- " + impressionURL);
+        LOG.info("IMPRESSION URL " + " -- " + impressionURL);
       }
       if (entry.getKey().equals("clickURL")) {
         clickURL = entry.getValue();
-        log.info("CLICK URL " + " -- " + clickURL);
+        LOG.info("CLICK URL " + " -- " + clickURL);
       }
       if (entry.getKey().equals("winNotifyUrl")) {
         winNotifyUrl = entry.getValue();
-        log.info("WIN NOTIFY URL " + " -- " + winNotifyUrl);
+        LOG.info("WIN NOTIFY URL " + " -- " + winNotifyUrl);
       }
+      if (entry.getKey().equals("transactionID")) {
+        transactionID = entry.getValue();
+        LOG.info("transactionID " + " -- " + transactionID);
+      }
+
+
     }
 
-    // wait for log file to get populated
+    // wait for LOG file to get populated
     ServerRequestUtility.waitForLogsToGetPopulated(
         serviceEndPoint,
-        "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep "
+        "cat /var/phunware/dsp/logs/abm-dsp-srv.LOG | grep "
             + "\"Considering placement id "
             + placementID
             + " for Country constraint\"");
 
-    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
+    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.LOG
     data =
         AdsServerUtility.logInToServerExecuteShellCommandAndReturnResponse(
-            serviceEndPoint, "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep " + placementID);
+            serviceEndPoint, "cat /var/phunware/dsp/logs/abm-dsp-srv.LOG | grep " + placementID);
     ServerRequestUtility.writeToFile(
         data, System.getProperty("user.dir") + "/src/main/resources/abm-dsp-srv.txt");
 
-    log.info("Captured log lines from abm-dsp-srv.log containing Placement ID - " + placementID);
+    LOG.info("Captured LOG lines from abm-dsp-srv.LOG containing Placement ID - " + placementID);
   }
 
   @AfterClass(alwaysRun = true)
@@ -150,6 +152,7 @@ public class Targeting {
         placementID,
         "creativeId",
         creativeID,
+        "transactionID",transactionID,
         System.getProperty("user.dir") + "/src/main/resources/runTimeData.Properties");
 
     // Save Impression Url, Click URl, WinNotify URL & No of times ImpressionURL is supposed to be
@@ -163,6 +166,7 @@ public class Targeting {
         winNotifyUrl,
         "noOfHitsImpressionURL",
         "10",
+            "transactionID",transactionID,
         System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties");
   }
 
@@ -422,7 +426,7 @@ public class Targeting {
   public static void placementConstraintValidator(String regexSubString) {
 
     // Validating presence of "Placement: `placementID` Constraint: `constraint name` is valid" in
-    // abm-dsp-srv.log file
+    // abm-dsp-srv.LOG file
 
     String regex =
         ".+?- (Placement.*?:.*?" + placementID + ".*?Constraint: " + regexSubString + " is valid)";
@@ -431,8 +435,8 @@ public class Targeting {
     Assert.assertTrue(
         regexMatcher.find(), "Could not find pattern `" + regex + "` in the file abm-dsp-srv.txt");
 
-    log.info(regexSubString + " passed, `abm-dsp-srv.log` Contains: ");
-    log.info(regexMatcher.group(1));
+    LOG.info(regexSubString + " passed, `abm-dsp-srv.LOG` Contains: ");
+    LOG.info(regexMatcher.group(1));
   }
 
   public static void creativeConstraintValidator(String regexSubString) {
@@ -453,7 +457,7 @@ public class Targeting {
     Assert.assertTrue(
         regexMatcher.find(), "Could not find pattern `" + regex + "` in the file abm-dsp-srv.txt");
 
-    log.info(regexSubString + " passed, `abm-dsp-srv.log` Contains: ");
-    log.info(regexMatcher.group(1));
+    LOG.info(regexSubString + " passed, `abm-dsp-srv.LOG` Contains: ");
+    LOG.info(regexMatcher.group(1));
   }
 }

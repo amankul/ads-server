@@ -12,7 +12,7 @@ import static io.restassured.RestAssured.given;
 public class LineItemUtility {
 
   // Initiating Logger Object
-  private static final Logger log = LogManager.getLogger();
+  private static final Logger LOG = LogManager.getLogger();
   private static String randomvalue;
   private static String lineItemID;
   private static String budgetDaily;
@@ -45,8 +45,8 @@ public class LineItemUtility {
             .replaceAll("endDateToBeChanged", endDate);
 
     // Printing Request Details
-    log.debug("REQUEST-URL:POST-" + requestURL);
-    log.debug("REQUEST-BODY:" + requestBody);
+    LOG.debug("REQUEST-URL:POST-" + requestURL);
+    LOG.debug("REQUEST-BODY:" + requestBody);
 
     // Extracting response after status code validation
     Response response =
@@ -62,12 +62,12 @@ public class LineItemUtility {
             .response();
 
     // printing response
-    log.debug("RESPONSE:" + response.asString());
-    log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
+    LOG.debug("RESPONSE:" + response.asString());
+    LOG.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
 
     // capturing campaign ID
     lineItemID = response.then().extract().path("data.id").toString();
-    log.info("Created New LineItem - ID - " + lineItemID);
+    LOG.info("Created New LineItem - ID - " + lineItemID);
 
     return lineItemID;
   }
@@ -79,7 +79,7 @@ public class LineItemUtility {
     String requestURL = serviceEndPoint + lineItemRequestEndPoint + "/" + lineItemID;
 
     // Printing Request Details
-    log.debug("REQUEST-URL:DELETE-" + requestURL);
+    LOG.debug("REQUEST-URL:DELETE-" + requestURL);
 
     // Extracting response after status code validation
     Response response =
@@ -93,7 +93,7 @@ public class LineItemUtility {
             .extract()
             .response();
 
-    log.info("Deleted LineItem - " + lineItemID);
+    LOG.info("Deleted LineItem - " + lineItemID);
   }
 
   public static void updateLineItem(
@@ -107,7 +107,7 @@ public class LineItemUtility {
     String requestURL = serviceEndPoint + lineItemRequestEndPoint + "/" + lineItemID;
 
     // Printing Request Details
-    log.debug("REQUEST-URL:PUT-" + requestURL);
+    LOG.debug("REQUEST-URL:PUT-" + requestURL);
 
     // Extracting response after status code validation
     Response response =
@@ -122,7 +122,7 @@ public class LineItemUtility {
             .extract()
             .response();
 
-    log.info("Updated LineItem ID - " + lineItemID + ", Status Updated to - " + statusID);
+    LOG.info("Updated LineItem ID - " + lineItemID + ", Status Updated to - " + statusID);
   }
 
   public static void updateLineItemUsingRequestBody(
@@ -136,7 +136,7 @@ public class LineItemUtility {
     String requestURL = serviceEndPoint + lineItemRequestEndPoint + "/" + lineItemID;
 
     // Printing Request Details
-    log.debug("REQUEST-URL:PUT-" + requestURL);
+    LOG.debug("REQUEST-URL:PUT-" + requestURL);
 
     // Extracting response after status code validation
     Response response =
@@ -151,7 +151,7 @@ public class LineItemUtility {
             .extract()
             .response();
 
-    log.info("Updated LineItem ID - " + lineItemID + " With request Body " + requestBody);
+    LOG.info("Updated LineItem ID - " + lineItemID + " With request Body " + requestBody);
   }
 
   public static void initializeData(String serviceEndPoint) {

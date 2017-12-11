@@ -12,7 +12,7 @@ import static io.restassured.RestAssured.given;
 public class CreativeUtility {
 
   // Initiating Logger Object
-  private static final Logger log = LogManager.getLogger();
+  private static final Logger LOG = LogManager.getLogger();
   private static String randomvalue;
   private static String creativeID;
   private static ArrayList<String> dbResult;
@@ -33,8 +33,8 @@ public class CreativeUtility {
             .replaceAll("nameToBeChanged", randomvalue);
 
     // Printing Request Details
-    log.debug("REQUEST-URL:POST-" + requestURL);
-    log.debug("REQUEST-BODY:" + requestBody);
+    LOG.debug("REQUEST-URL:POST-" + requestURL);
+    LOG.debug("REQUEST-BODY:" + requestBody);
 
     // Extracting response after status code validation
     Response response =
@@ -50,12 +50,54 @@ public class CreativeUtility {
             .response();
 
     // printing response
-    log.debug("RESPONSE:" + response.asString());
-    log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
+    LOG.debug("RESPONSE:" + response.asString());
+    LOG.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
 
     // capturing created lineItem ID
     creativeID = response.then().extract().path("data.id").toString();
-    log.info("Created New Creative - ID - " + creativeID);
+    LOG.info("Created New Creative - ID - " + creativeID);
+
+    return creativeID;
+  }
+
+  public static String createJSCreative(
+      String serviceEndPoint, String auth, String creativeRequestEndPoint) {
+
+    initializeData(serviceEndPoint);
+
+    // Request Details
+    String requestURL = serviceEndPoint + creativeRequestEndPoint;
+    String requestBody =
+        JsonUtilities.jsonToString(
+                System.getProperty("user.dir")
+                    + "/src/main/java/com/phunware/ads/json/creativeJS.json")
+            .replaceAll("advertiserIdToBeChanged", advertiserId)
+            .replaceAll("nameToBeChanged", randomvalue);
+
+    // Printing Request Details
+    LOG.debug("REQUEST-URL:POST-" + requestURL);
+    LOG.debug("REQUEST-BODY:" + requestBody);
+
+    // Extracting response after status code validation
+    Response response =
+        given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", auth)
+            .request()
+            .body(requestBody)
+            .post(requestURL)
+            .then()
+            .statusCode(201)
+            .extract()
+            .response();
+
+    // printing response
+    LOG.debug("RESPONSE:" + response.asString());
+    LOG.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
+
+    // capturing created lineItem ID
+    creativeID = response.then().extract().path("data.id").toString();
+    LOG.info("Created New Creative - ID - " + creativeID);
 
     return creativeID;
   }
@@ -67,7 +109,7 @@ public class CreativeUtility {
     String requestURL = serviceEndPoint + creativeRequestEndPoint + "/" + creativeID;
 
     // Printing Request Details
-    log.debug("REQUEST-URL:DELETE-" + requestURL);
+    LOG.debug("REQUEST-URL:DELETE-" + requestURL);
 
     // Extracting response after status code validation
     Response response =
@@ -81,7 +123,7 @@ public class CreativeUtility {
             .extract()
             .response();
 
-    log.info("Deleted Creative ID - " + creativeID);
+    LOG.info("Deleted Creative ID - " + creativeID);
   }
 
   public static void updateCreative(
@@ -89,13 +131,13 @@ public class CreativeUtility {
       String creativeRequestEndPoint,
       String auth,
       String creativeID,
-      String statusID) {
+      String requestBody) {
 
     // Request Details
     String requestURL = serviceEndPoint + creativeRequestEndPoint + "/" + creativeID;
 
     // Printing Request Details
-    log.debug("REQUEST-URL:PUT-" + requestURL);
+    LOG.debug("REQUEST-URL:PUT-" + requestURL);
 
     // Extracting response after status code validation
     Response response =
@@ -103,14 +145,39 @@ public class CreativeUtility {
             .header("Content-Type", "application/json")
             .header("Authorization", auth)
             .request()
-            .body("{\"statusId\": " + statusID + "}")
+            .body(requestBody)
             .put(requestURL)
             .then()
             .statusCode(200)
             .extract()
             .response();
 
-    log.info("Updated Creative ID - " + creativeID + ", Status to Running - " + statusID);
+    LOG.info("Updated Creative ID - " + creativeID + ", With request body - " + requestBody);
+  }
+
+  public static void getCreative(
+      String serviceEndPoint, String creativeRequestEndPoint, String auth, String creativeID) {
+
+    // Request Details
+    String requestURL = serviceEndPoint + creativeRequestEndPoint + "/" + creativeID;
+
+    // Printing Request Details
+    LOG.debug("REQUEST-URL:GET-" + requestURL);
+
+    // Extracting response after status code validation
+    Response response =
+        given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", auth)
+            .request()
+            .get(requestURL)
+            .then()
+            .statusCode(200)
+            .extract()
+            .response();
+
+    LOG.info(" Creative ID - " + creativeID);
+    LOG.info(response.asString());
   }
 
   public static void initializeData(String serviceEndPoint) {

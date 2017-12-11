@@ -4,10 +4,10 @@ import com.phunware.ads.utilities.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class Capping {
 
   // Initiating Logger Object
-  private static final Logger log = LogManager.getLogger();
+  private static final Logger LOG = LogManager.getLogger();
   private static String creativeID;
   private static String campaignID;
   private static String lineItemID;
@@ -85,35 +85,65 @@ public class Capping {
         ServerRequestUtility.readDataFromPropertiesFile(
             "impressionURL",
             System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties");
-    log.info("Impression URL - " + impressionURL);
+    LOG.info("Impression URL - " + impressionURL);
   }
 
-  @AfterClass(alwaysRun = true)
-  @Parameters({
-    "serviceEndPoint",
-    "auth",
-    "campaignRequestEndPoint",
-    "lineItemRequestEndPoint",
-    "creativeRequestEndPoint",
-    "placementRequestEndPoint"
-  })
-  public void postTestSteps(
-      String serviceEndPoint,
-      String auth,
-      String campaignRequestEndPoint,
-      String lineItemRequestEndPoint,
-      String creativeRequestEndPoint,
-      String placementRequestEndPoint) {
+  @AfterClass
+  public void cleanUP() {
 
-    //        delete Campaign, LineItem & Placement & Creative
-    //        CampaignUtility.deleteCampaign(serviceEndPoint, campaignRequestEndPoint, auth,
-    // campaignID);
-    //        LineItemUtility.deleteLineItem(serviceEndPoint, lineItemRequestEndPoint, auth,
-    // lineItemID);
-    //        CreativeUtility.deleteCreative(serviceEndPoint, creativeRequestEndPoint, auth,
-    // creativeID);
-    //        PlacementUtility.deletePlacement(serviceEndPoint, placementRequestEndPoint, auth,
-    // placementID);
+    // delete earlier created campaign,LineItem & placement.
+    CampaignUtility.deleteCampaign(serviceEndPoint, campaignRequestEndPoint, auth, campaignID);
+    LineItemUtility.deleteLineItem(serviceEndPoint, lineItemRequestEndPoint, auth, lineItemID);
+    PlacementUtility.deletePlacement(serviceEndPoint, placementRequestEndPoint, auth, placementID);
+
+    // Create new Campaign, LineItem & Placement
+    campaignID = CampaignUtility.createCampaign(serviceEndPoint, auth, campaignRequestEndPoint);
+    lineItemID =
+        LineItemUtility.createLineItem(serviceEndPoint, auth, lineItemRequestEndPoint, campaignID);
+    placementID =
+        PlacementUtility.createPlacementExistingDealID(
+            serviceEndPoint, auth, placementRequestEndPoint, creativeID, lineItemID);
+
+    // Save created ID's in a property file
+    ServerRequestUtility.writePropertyFile(
+        "campaignId",
+        campaignID,
+        "lineItemId",
+        lineItemID,
+        "placementId",
+        placementID,
+        "creativeId",
+        creativeID,
+        "ImpressionURL",
+        impressionURL,
+        System.getProperty("user.dir") + "/src/main/resources/runTimeData.Properties");
+
+    // Update earlier created Campaign, Line Item & Placement to running  - `600 status ID`
+    CampaignUtility.updateCampaign(
+        serviceEndPoint, campaignRequestEndPoint, auth, campaignID, "600");
+    LineItemUtility.updateLineItem(
+        serviceEndPoint, lineItemRequestEndPoint, auth, lineItemID, "600");
+    PlacementUtility.updatePlacement(
+        serviceEndPoint, placementRequestEndPoint, auth, placementID, "600");
+
+    // waiting for DG
+    ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
+
+    //      // Save Impression Url, Click URl, WinNotify URL & No of times ImpressionURL is supposed
+    // to be
+    //      // hit.
+    //      ServerRequestUtility.writePropertyFile(
+    //              "impressionURL",
+    //              impressionURL,
+    //              "clickURL",
+    //              clickURL,
+    //              "winNotifyURL",
+    //              winNotifyUrl,
+    //              "noOfHitsImpressionURL",
+    //              "10",
+    //              System.getProperty("user.dir") +
+    // "/src/main/resources/BidResponseData.Properties");
+
   }
 
   // *****************  BUDGET CAP TESTS *************//
@@ -139,36 +169,35 @@ public class Capping {
         placementID,
         "{\"optimizationTarget\": null,\"optimizationTargetTypeId\": null,\"optimizationSampleSizeTypeId\": null,\"optimizationSampleSize\": null,\"optimizationEmailNotification\": null}");
 
-    //waiting for DG
-    ServerRequestUtility.waitForDataGenerator(serviceEndPoint,auth);
+    // waiting for DG
+    ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
 
     // Hitting the impression URL - 10 times
-    ServerRequestUtility.hitImpressionURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 10);
+    ServerRequestUtility.hitURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 10);
 
     // NOTE - LineItem with retail price 95 is hit 10 times (0.95) + earlier 0.05 making it match
     // the 1$ placement cap.
 
     // Hitting impression url one more time to cross budget cap
-    ServerRequestUtility.hitImpressionURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 1);
+    ServerRequestUtility.hitURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 1);
 
     getDataFromAeroSpike();
 
     // Sending Bid request after the placement cap is reached.
-    ServerRequestUtility.postBidRequest_NoSucessCheck(runtimeEndPoint,"runTimeRequest.json");
+    ServerRequestUtility.postBidRequest_NoSucessCheck(runtimeEndPoint, "runTimeRequest.json");
 
-    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
+    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.LOG
     String data =
         ServerRequestUtility.waitForLogsToGetPopulated(
             serviceEndPoint,
             "grep \"Placement: "
                 + placementID
-                + " Constraint: BudgetConstraint\" /var/phunware/dsp/logs/abm-dsp-srv.log | tail -1");
-
+                + " Constraint: BudgetConstraint\" /var/phunware/dsp/logs/abm-dsp-srv.LOG | tail -1");
 
     // looking for BudgetConstraint invalidation in logs
     Assert.assertTrue(
         data.contains(placementID + " Constraint: BudgetConstraint is INVALID"),
-        "Found in logs -> " + data);
+        "Server Log data -> " + data);
   }
 
   /*
@@ -190,133 +219,135 @@ public class Capping {
     PlacementUtility.updatePlacementWithRequestBody(
         serviceEndPoint, placementRequestEndPoint, auth, placementID, "{\"budgetDaily\": 10.00}");
 
-      //waiting for DG
-      ServerRequestUtility.waitForDataGenerator(serviceEndPoint,auth);
+    // waiting for DG
+    ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
 
     // Hitting the impression URL - 10 times
-    ServerRequestUtility.hitImpressionURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 10);
+    ServerRequestUtility.hitURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 10);
 
     // NOTE - LineItem with retail price 90.5 is hit 10 times (0.905) + earlier 1.095 making it
     // match the 2$ LineItem cap.
 
     // Hitting impression url one more time to cross budget cap
-    ServerRequestUtility.hitImpressionURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 1);
+    ServerRequestUtility.hitURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 1);
     getDataFromAeroSpike();
 
     // Sending Bid request after the placement cap is reached.
-    int statusCode = ServerRequestUtility.postBidRequest_NoSucessCheck(runtimeEndPoint,"runTimeRequest.json");
+    int statusCode =
+        ServerRequestUtility.postBidRequest_NoSucessCheck(runtimeEndPoint, "runTimeRequest.json");
     Assert.assertEquals(
         statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
   }
 
+  // *****************  FREQUENCY CAP TESTS *************//
 
-    // *****************  FREQUENCY CAP TESTS *************//
-
-    /*
+  /*
   Verify Frequency cap limit when budget for Campaign=$100.03 , LineItem =$10.00 & Placement=$10.00
   set placement - "dailyFcap": 10
   */
 
-    @Test(priority = 3)
-    public void verifyFrequencyCap() {
+  @Test(priority = 3)
+  public void verifyFrequencyCap() {
 
-        LineItemUtility.updateLineItemUsingRequestBody(
-                serviceEndPoint, lineItemRequestEndPoint, auth, lineItemID, "{\"budgetDaily\": 10.00}");
+    LineItemUtility.updateLineItemUsingRequestBody(
+        serviceEndPoint, lineItemRequestEndPoint, auth, lineItemID, "{\"budgetDaily\": 10.00}");
 
-        PlacementUtility.updatePlacementWithRequestBody(
-                serviceEndPoint, placementRequestEndPoint, auth, placementID, "{\"dailyFcap\": 10}");
+    PlacementUtility.updatePlacementWithRequestBody(
+        serviceEndPoint, placementRequestEndPoint, auth, placementID, "{\"dailyFcap\": 10}");
 
-        //waiting for DG
-        ServerRequestUtility.waitForDataGenerator(serviceEndPoint,auth);
+    // waiting for DG
+    ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
 
-        //posting bid request with new device ID
-        postBidRequest("runTimeRequest_NewDeviceID1.json");
+    //TODO - check the right JSON
+    // posting bid request with new device ID
+    //postBidRequest("runTimeRequest_NewDeviceID1.json");
+    postBidRequest("runTimeRequest.json");
 
-        //hitting new impression url 11 times , making it go over the frequency cap "dailyFcap --> 10" set earlier
-        ServerRequestUtility.hitImpressionURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 11);
+    // hitting new impression url 11 times , making it go over the frequency cap "dailyFcap --> 10"
+    // set earlier
+    ServerRequestUtility.hitURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 11);
 
-        // Sending Bid request after the placement cap is exceeded.
-        int statusCode = ServerRequestUtility.postBidRequest_NoSucessCheck(runtimeEndPoint,"runTimeRequest_NewDeviceID1.json");
-        Assert.assertEquals(
-                statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+    // Sending Bid request after the placement cap is exceeded.
+    int statusCode =
+        ServerRequestUtility.postBidRequest_NoSucessCheck(
+            runtimeEndPoint, "runTimeRequest_NewDeviceID1.json");
+    Assert.assertEquals(
+        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
 
-        // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
-        String data =
-                ServerRequestUtility.waitForLogsToGetPopulated(
-                        serviceEndPoint,
-                        "grep \"Placement: "
-                                + placementID
-                                + " Constraint: DeviceFrequencyCapConstraint is INVALID\" /var/phunware/dsp/logs/abm-dsp-srv.log | tail -1");
+    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.LOG
+    String data =
+        ServerRequestUtility.waitForLogsToGetPopulated(
+            serviceEndPoint,
+            "grep \"Placement: "
+                + placementID
+                + " Constraint: DeviceFrequencyCapConstraint is INVALID\" /var/phunware/dsp/logs/abm-dsp-srv.LOG | tail -1");
 
-        // looking for BudgetConstraint invalidation in logs
-        // Expecting "Placement: placementID Constraint: DeviceFrequencyCapConstraint is INVALID"
-        Assert.assertTrue(
-                data.contains(placementID + " Constraint: DeviceFrequencyCapConstraint is INVALID"),
-                "Found in logs -> " + data);
+    // looking for BudgetConstraint invalidation in logs
+    // Expecting "Placement: placementID Constraint: DeviceFrequencyCapConstraint is INVALID"
+    Assert.assertTrue(
+        data.contains(placementID + " Constraint: DeviceFrequencyCapConstraint is INVALID"),
+        "log data -> " + data);
+  }
 
-    }
-
-    /*
+  /*
   Verify Frequency cap limit when placement cap is exceeded & when new device ID is used in the bid request
   */
-    @Test(priority = 4)
-    public void verifyFrequencyCap_NewDeviceID() {
+  @Test(priority = 4)
+  public void verifyFrequencyCap_NewDeviceID() {
 
-        // Sending Bid request with a new device ID - Expecting the bid request to be successful.
-        int statusCode = ServerRequestUtility.postBidRequest_NoSucessCheck(runtimeEndPoint,"runTimeRequest_NewDeviceID2.json" );
-        Assert.assertEquals(
-                statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+    // Sending Bid request with a new device ID - Expecting the bid request to be successful.
+    int statusCode =
+        ServerRequestUtility.postBidRequest_NoSucessCheck(
+            runtimeEndPoint, "runTimeRequest_NewDeviceID2.json");
+    Assert.assertEquals(
+        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+  }
 
-    }
+  // *****************  CAPPING UTILITY METHODS *************//
 
-
-    // *****************  CAPPING UTILITY METHODS *************//
-
-    public static void getDataFromAeroSpike() {
+  public static void getDataFromAeroSpike() {
 
     // Capturing todays data to get Aerospike key
     String todaysDate = LocalDateTime.now().toString().replaceAll("[-:.T]", "").substring(0, 8);
-    log.info("Aerospike Key - " + "sd:plac" + placementID + ":" + todaysDate);
+    LOG.info("Aerospike Key - " + "sd:plac" + placementID + ":" + todaysDate);
 
     // getting data from aerospike
-    log.info("Capturing Areospike data");
+    LOG.info("Capturing Areospike data");
     String aeroSpikeData =
         AeroSpikeUtility.LogInToAerospikeExecuteAqlQueryAndReturnResponse(
             serviceEndPoint, "dsp", "counters", "sd:plac" + placementID + ":" + todaysDate);
-    log.info("Aero Spike Data - " + aeroSpikeData);
+    LOG.info("Aero Spike Data - " + aeroSpikeData);
 
     String regex = ".*?cost:(.*?)\\).*spend:(.*?)\\).*?.*imp:(.*?)\\).*?";
     Matcher regexMatcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(aeroSpikeData);
-    Assert.assertTrue(regexMatcher.find(), "Could not find cost and sepnd from aerospike data");
+    Assert.assertTrue(regexMatcher.find(), "Could not find cost and spend from aerospike data");
 
     aerospikeCost = Double.valueOf(regexMatcher.group(1));
-    log.debug("Cost from Aerospike -" + regexMatcher.group(1));
+    LOG.debug("Cost from Aerospike -" + regexMatcher.group(1));
     aerospikeSpend = Double.valueOf(regexMatcher.group(2));
-    log.debug("Spend from Aerospike -" + regexMatcher.group(2));
+    LOG.debug("Spend from Aerospike -" + regexMatcher.group(2));
     noOfImpressions = Integer.valueOf(regexMatcher.group(3));
-    log.debug("Impressions from Aerospike -" + regexMatcher.group(3));
+    LOG.debug("Impressions from Aerospike -" + regexMatcher.group(3));
   }
 
-  public static void postBidRequest(String fileName){
+  public static void postBidRequest(String fileName) {
 
-      // POST REQUEST TO DSP SERVER, CAPTURE DATA
-      HashMap<String, String> result = ServerRequestUtility.postBidRequest(runtimeEndPoint ,fileName );
-      Assert.assertTrue(result.size() == 3, "Bid Request is not successful");
-      for (HashMap.Entry<String, String> entry : result.entrySet()) {
-          if (entry.getKey().equals("impressionURL")) {
-              impressionURL = entry.getValue();
-              log.info("IMPRESSION URL " + " -- " + impressionURL);
-          }
-          if (entry.getKey().equals("clickURL")) {
-              clickURL = entry.getValue();
-              log.info("CLICK URL " + " -- " + clickURL);
-          }
-          if (entry.getKey().equals("winNotifyUrl")) {
-              winNotifyUrl = entry.getValue();
-              log.info("WIN NOTIFY URL " + " -- " + winNotifyUrl);
-          }
+    // POST REQUEST TO DSP SERVER, CAPTURE DATA
+    HashMap<String, String> result = ServerRequestUtility.postBidRequest(runtimeEndPoint, fileName);
+    Assert.assertTrue(result.size() == 3, "Bid Request is not successful");
+    for (HashMap.Entry<String, String> entry : result.entrySet()) {
+      if (entry.getKey().equals("impressionURL")) {
+        impressionURL = entry.getValue();
+        LOG.info("IMPRESSION URL " + " -- " + impressionURL);
       }
+      if (entry.getKey().equals("clickURL")) {
+        clickURL = entry.getValue();
+        LOG.info("CLICK URL " + " -- " + clickURL);
+      }
+      if (entry.getKey().equals("winNotifyUrl")) {
+        winNotifyUrl = entry.getValue();
+        LOG.info("WIN NOTIFY URL " + " -- " + winNotifyUrl);
+      }
+    }
   }
-
 }
-

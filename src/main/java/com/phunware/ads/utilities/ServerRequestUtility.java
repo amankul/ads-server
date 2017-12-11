@@ -5,6 +5,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -15,7 +18,7 @@ import static io.restassured.RestAssured.given;
 public class ServerRequestUtility {
 
   // Initiating Logger Object
-  private static final Logger log = LogManager.getLogger();
+  private static final Logger LOG = LogManager.getLogger();
   private static String randomValue;
 
   public static HashMap<String, String> postBidRequest(String runtimeEndPoint, String fileName) {
@@ -35,8 +38,8 @@ public class ServerRequestUtility {
             .replaceAll("DealIDAutomation", "DealIDAutomation" + randomValue);
 
     // Printing Request Details
-    log.info("REQUEST-URL:POST-" + requestURL);
-    log.info("REQUEST-BODY:" + requestBody);
+    LOG.info("REQUEST-URL:POST-" + requestURL);
+    LOG.info("REQUEST-BODY:" + requestBody);
 
     // Extracting response after status code validation
     Response response =
@@ -51,27 +54,30 @@ public class ServerRequestUtility {
             .response();
 
     // printing response
-    log.info("RESPONSE:" + response.asString());
-    log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
+    LOG.info("RESPONSE:" + response.asString());
+    LOG.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
 
     // Capturing data from response
     String winNotifyUrl =
         response.then().extract().path("seatbid.bid.nurl").toString().replaceAll("[\\[\\]]", "");
     String clickAndImpressionURL = response.then().extract().path("seatbid.bid.adm").toString();
+    String transactionID = response.then().extract().path("seatbid.bid.id").toString();
 
     // parsing data
     HashMap<String, String> result = new HashMap<>();
     result.put("winNotifyUrl", winNotifyUrl);
-    log.debug("Win Notify URL -" + winNotifyUrl);
+    LOG.debug("Win Notify URL -" + winNotifyUrl);
+    result.put("transactionID", transactionID);
+    LOG.debug("transactionID -" + transactionID);
 
     Matcher regexMatcher =
         Pattern.compile(".+?(http.+?/click.*?)\".*?http.*?\"(http.?://.+?/impression.*?)\"")
             .matcher(clickAndImpressionURL);
     if (regexMatcher.find()) {
       result.put("clickURL", regexMatcher.group(1));
-      log.debug("click URL -" + regexMatcher.group(1));
+      LOG.debug("click URL -" + regexMatcher.group(1));
       result.put("impressionURL", regexMatcher.group(2));
-      log.debug("impression URL -" + regexMatcher.group(2));
+      LOG.debug("impression URL -" + regexMatcher.group(2));
     }
 
     return result;
@@ -93,8 +99,8 @@ public class ServerRequestUtility {
             .replaceAll("DealIDAutomation", "DealIDAutomation" + randomValue);
 
     // Printing Request Details
-    log.info("REQUEST-URL:POST-" + requestURL);
-    log.info("REQUEST-BODY:" + requestBody);
+    LOG.info("REQUEST-URL:POST-" + requestURL);
+    LOG.info("REQUEST-BODY:" + requestBody);
 
     // Extracting response after status code validation
     Response response =
@@ -108,8 +114,8 @@ public class ServerRequestUtility {
             .response();
 
     // printing response
-    log.info("RESPONSE:" + response.asString());
-    log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
+    LOG.info("RESPONSE:" + response.asString());
+    LOG.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
 
     return response.statusCode();
   }
@@ -146,7 +152,7 @@ public class ServerRequestUtility {
     String data = "";
 
     while (retry >= count) {
-      log.info("Waiting for abm-dsp-srv.log to get populated with  data ..");
+      LOG.info("Waiting for abm-dsp-srv.log to get populated with  data ..");
       ServerRequestUtility.wait(5);
       // looking for String "Placement: `placementID` Constraint: BudgetConstraint is INVALID"
       data =
@@ -154,7 +160,7 @@ public class ServerRequestUtility {
               serviceEndPoint, command);
       count++;
       if (data.length() > 10) {
-        log.info("Found Data --> " + data);
+        LOG.info("Found Data --> " + data);
         return data;
       }
     }
@@ -163,12 +169,11 @@ public class ServerRequestUtility {
 
   public static void invokeDataGenerator(String serviceEndPoint, String auth) {
 
-    log.info("Invoking Data Generator");
-
+    LOG.info("Invoking Data Generator");
     String requestURL = serviceEndPoint + "/api/v1.0/datagenerator";
 
     // Printing Request Details
-    log.debug("REQUEST-URL:POST-" + requestURL);
+    LOG.debug("REQUEST-URL:POST-" + requestURL);
 
     // Extracting response after status code validation
     Response response =
@@ -182,8 +187,8 @@ public class ServerRequestUtility {
             .response();
 
     // printing response
-    log.info("DG Run Complete - " + response.asString());
-    log.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
+    LOG.info("DG Run Complete - " + response.asString());
+    LOG.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
   }
 
   public static void writePropertyFile(
@@ -195,6 +200,8 @@ public class ServerRequestUtility {
       String value2,
       String key3,
       String value3,
+      String key4,
+      String value4,
       String filePath) {
 
     Properties prop = new Properties();
@@ -206,7 +213,8 @@ public class ServerRequestUtility {
       prop.setProperty(key1, value1);
       prop.setProperty(key2, value2);
       prop.setProperty(key3, value3);
-      prop.store(output, key + "," + key1 + "," + key2 + "," + key3 + " --> Data");
+      prop.setProperty(key4, value4);
+      prop.store(output, key + "," + key1 + "," + key2 + "," + key3 + "," + key4 + "   --> Data");
       output.close();
     } catch (FileNotFoundException ex) {
       // file does not exist
@@ -234,16 +242,29 @@ public class ServerRequestUtility {
     return pro.getProperty(propertyName);
   }
 
-  public static void hitImpressionURL(String url, int numOfHits) {
+  public static void hitURL(String url, int numOfHits) {
 
-    log.info("Hitting URL - " + url);
-    log.info(numOfHits + " Times");
+    LOG.info("Hitting URL - " + url);
+    LOG.info(numOfHits + " Times");
 
     for (int i = 0; i < numOfHits; i++) {
-      given().header("Content-Type", "application/json").request().get(url).then().statusCode(204);
+      given().header("Content-Type", "application/json").request().get(url);
     }
 
-    log.info("Impression URL is hit " + numOfHits + " Times");
+    LOG.info("URL is hit " + numOfHits + " Times");
+  }
+
+  public static void hitConversionURL(String transactionID, String runtimeEndPoint, int numOfHits) {
+    LOG.info("Hitting Conversion URL - " + runtimeEndPoint);
+    LOG.info(numOfHits + " Times");
+
+    for (int i = 0; i < numOfHits; i++) {
+      given()
+          .header("Content-Type", "application/json")
+          .request()
+          .get(runtimeEndPoint.replaceAll("bidRequest", "conversion?tx=" + transactionID));
+    }
+    LOG.info("Conversion URL is hit " + numOfHits + " Times");
   }
 
   public static void waitForDataGenerator(String serviceEndPoint, String auth) {
@@ -251,9 +272,33 @@ public class ServerRequestUtility {
     // Invoking DG
     ServerRequestUtility.invokeDataGenerator(serviceEndPoint, auth);
 
-    // Waiting for the Dg to pick up updated data
+    // Waiting for the DG to pick up updated data
     ServerRequestUtility.pullDataToAdsServer(serviceEndPoint);
-    log.info("Waiting for the data generator, Giving it time to update: Wait Time 3.5 minutes");
-    ServerRequestUtility.wait(210);
+    LOG.info("Waiting for the data generator, Giving it time to update: Wait Time 4 minutes");
+    ServerRequestUtility.wait(240);
+  }
+
+
+  public static String getPlacementDataFromELasticSearch(String serviceEndPoint, String placementID, String auth){
+
+    //Using reporting API
+    Long startOfToday =  LocalDate.now().atStartOfDay(ZoneId.of("UTC")).toEpochSecond() * 1000;
+    Long endOfToday =  Instant.now().toEpochMilli();
+
+    String url = serviceEndPoint + "/api/v1.0/metrics/placements?pids=" + placementID +"&stdt="+startOfToday+"&endt="+endOfToday;
+
+    LOG.info("URL -"+url);
+
+    Response response =  given()
+            .header("Content-Type", "application/json")
+             .header("Authorization",auth)
+            .request()
+            .get(url)
+            .then()
+            .extract().response();
+
+    LOG.info("Captured ES data - "+ response.asString());
+    return response.asString();
+
   }
 }
