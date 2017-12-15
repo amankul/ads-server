@@ -255,14 +255,16 @@ public class ServerRequestUtility {
   }
 
   public static void hitConversionURL(String transactionID, String runtimeEndPoint, int numOfHits) {
-    LOG.info("Hitting Conversion URL - " + runtimeEndPoint);
+
+    String url = runtimeEndPoint.replaceAll("bidRequest", "conversion?tx=" + transactionID);
+    LOG.info("Hitting Conversion URL - " + url);
     LOG.info(numOfHits + " Times");
 
     for (int i = 0; i < numOfHits; i++) {
       given()
           .header("Content-Type", "application/json")
           .request()
-          .get(runtimeEndPoint.replaceAll("bidRequest", "conversion?tx=" + transactionID));
+          .get(url);
     }
     LOG.info("Conversion URL is hit " + numOfHits + " Times");
   }
@@ -278,6 +280,16 @@ public class ServerRequestUtility {
     ServerRequestUtility.wait(240);
   }
 
+  // Sleep
+  public static void sleep(int seconds) {
+    LOG.info("Wait time -"+seconds+ " Seconds");
+
+    try {
+      Thread.sleep(seconds * 1000);
+    } catch (InterruptedException ex) {
+    } catch (IllegalArgumentException ex) {
+    }
+  }
 
   public static String getPlacementDataFromELasticSearch(String serviceEndPoint, String placementID, String auth){
 

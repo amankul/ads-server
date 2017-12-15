@@ -34,7 +34,7 @@
     "name":"Clapfoot-VirtualTableTennis3DFree-Android",
     "id":"67937",
     "domain":"market.android.com",
-    "bundle":"249"
+    "bundle":"254"
   },
   "device":{
     "ip":"192.200.182.12",
@@ -59,7 +59,7 @@
       "type":1
     },
     "connectionType":6,
-    "ifa":"68400100-8cf0-114d-b23e-10594e42345c"
+    "ifa":"68400000-8cf0-11bd-b23e-10b96e40000c"
   },
   "user":{
     "gender":"M",

@@ -105,6 +105,8 @@ public class CostSpendAndEventLogging {
                 System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties"));
     LOG.info("Expected impressions - " + expectedImpressions);
 
+    ServerRequestUtility.sleep(45);
+
     // getting data from aerospike
     LOG.info("Capturing Areospike data");
     String aeroSpikeData =
@@ -172,7 +174,7 @@ public class CostSpendAndEventLogging {
 
   //  ******** EventLogging Tests *******
   /*
-  TODO Event logging doesnot work as expected on stage.
+  TODO - Event logging functionality is not working as expected on stage.
   */
 
   @Test(priority = 4)

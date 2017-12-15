@@ -71,11 +71,10 @@ public class Targeting {
     ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
 
     // check placement status ID - if it is not 600 invoke data generator Again
-      if (PlacementUtility.getStatusId(serviceEndPoint, placementRequestEndPoint, auth, placementID)
+    if (PlacementUtility.getStatusId(serviceEndPoint, placementRequestEndPoint, auth, placementID)
         != 600) {
       // waiting for DG
       ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
-
     }
 
     // Change log4j2.xml logger level
@@ -103,26 +102,24 @@ public class Targeting {
         transactionID = entry.getValue();
         LOG.info("transactionID " + " -- " + transactionID);
       }
-
-
     }
 
     // wait for LOG file to get populated
     ServerRequestUtility.waitForLogsToGetPopulated(
         serviceEndPoint,
-        "cat /var/phunware/dsp/logs/abm-dsp-srv.LOG | grep "
+        "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep "
             + "\"Considering placement id "
             + placementID
             + " for Country constraint\"");
 
-    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.LOG
+    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
     data =
         AdsServerUtility.logInToServerExecuteShellCommandAndReturnResponse(
-            serviceEndPoint, "cat /var/phunware/dsp/logs/abm-dsp-srv.LOG | grep " + placementID);
+            serviceEndPoint, "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep " + placementID);
     ServerRequestUtility.writeToFile(
         data, System.getProperty("user.dir") + "/src/main/resources/abm-dsp-srv.txt");
 
-    LOG.info("Captured LOG lines from abm-dsp-srv.LOG containing Placement ID - " + placementID);
+    LOG.info("Captured log lines from abm-dsp-srv.log containing Placement ID - " + placementID);
   }
 
   @AfterClass(alwaysRun = true)
@@ -152,7 +149,8 @@ public class Targeting {
         placementID,
         "creativeId",
         creativeID,
-        "transactionID",transactionID,
+        "transactionID",
+        transactionID,
         System.getProperty("user.dir") + "/src/main/resources/runTimeData.Properties");
 
     // Save Impression Url, Click URl, WinNotify URL & No of times ImpressionURL is supposed to be
@@ -166,11 +164,12 @@ public class Targeting {
         winNotifyUrl,
         "noOfHitsImpressionURL",
         "10",
-            "transactionID",transactionID,
+        "transactionID",
+        transactionID,
         System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties");
   }
 
-  // ================================== PLACEMENT CONSTRAINTS  ============================================= //
+  // ================================== PLACEMENT CONSTRAINTS ============================================= //
 
   /*
   Verify successful Country Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
@@ -421,7 +420,7 @@ public class Targeting {
     creativeConstraintValidator("SecureConstraint");
   }
 
-  // ================================== UTILITY METHODS ============================================= //
+  // ================================== UTILITY METHODS  ============================================= //
 
   public static void placementConstraintValidator(String regexSubString) {
 
@@ -435,7 +434,7 @@ public class Targeting {
     Assert.assertTrue(
         regexMatcher.find(), "Could not find pattern `" + regex + "` in the file abm-dsp-srv.txt");
 
-    LOG.info(regexSubString + " passed, `abm-dsp-srv.LOG` Contains: ");
+    LOG.info(regexSubString + " passed, `abm-dsp-srv.log` Contains: ");
     LOG.info(regexMatcher.group(1));
   }
 
@@ -457,7 +456,7 @@ public class Targeting {
     Assert.assertTrue(
         regexMatcher.find(), "Could not find pattern `" + regex + "` in the file abm-dsp-srv.txt");
 
-    LOG.info(regexSubString + " passed, `abm-dsp-srv.LOG` Contains: ");
+    LOG.info(regexSubString + " passed, `abm-dsp-srv.log` Contains: ");
     LOG.info(regexMatcher.group(1));
   }
 }

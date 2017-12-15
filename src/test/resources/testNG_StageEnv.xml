@@ -23,6 +23,7 @@
             <class name="com.phunware.ads.tests.Capping"/>
             <class name="com.phunware.ads.tests.PrivateAuction"/>
             <class name="com.phunware.ads.tests.GeneralRTBSpecRegression"/>
+            <class name="com.phunware.ads.tests.DynamicCapping"/>
         </classes>
     </test>
 </suite>

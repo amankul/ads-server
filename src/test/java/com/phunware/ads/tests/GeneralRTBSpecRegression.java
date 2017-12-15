@@ -44,6 +44,14 @@ public class GeneralRTBSpecRegression {
       String creativeRequestEndPoint,
       String placementRequestEndPoint) {
 
+    this.runtimeEndPoint = runtimeEndPoint;
+    this.serviceEndPoint = serviceEndPoint;
+    this.creativeRequestEndPoint = creativeRequestEndPoint;
+    this.placementRequestEndPoint = placementRequestEndPoint;
+    this.campaignRequestEndPoint = campaignRequestEndPoint;
+    this.lineItemRequestEndPoint = lineItemRequestEndPoint;
+    this.auth = auth;
+
     // capture ID's from properties file.
     placementID =
         ServerRequestUtility.readDataFromPropertiesFile(
@@ -62,14 +70,6 @@ public class GeneralRTBSpecRegression {
             "lineItemId",
             System.getProperty("user.dir") + "/src/main/resources/runTimeData.Properties");
 
-    this.runtimeEndPoint = runtimeEndPoint;
-    this.serviceEndPoint = serviceEndPoint;
-    this.creativeRequestEndPoint = creativeRequestEndPoint;
-    this.placementRequestEndPoint = placementRequestEndPoint;
-    this.campaignRequestEndPoint = campaignRequestEndPoint;
-    this.lineItemRequestEndPoint = lineItemRequestEndPoint;
-    this.auth = auth;
-
     LOG.info("Placement Details ID -" + placementID);
     PlacementUtility.getPlacement(serviceEndPoint, placementRequestEndPoint, auth, placementID);
   }
@@ -81,36 +81,7 @@ public class GeneralRTBSpecRegression {
     CampaignUtility.deleteCampaign(serviceEndPoint, campaignRequestEndPoint, auth, campaignID);
     LineItemUtility.deleteLineItem(serviceEndPoint, lineItemRequestEndPoint, auth, lineItemID);
     PlacementUtility.deletePlacement(serviceEndPoint, placementRequestEndPoint, auth, placementID);
-
-    // Create new Campaign, LineItem & Placement
-    campaignID = CampaignUtility.createCampaign(serviceEndPoint, auth, campaignRequestEndPoint);
-    lineItemID =
-        LineItemUtility.createLineItem(serviceEndPoint, auth, lineItemRequestEndPoint, campaignID);
-    placementID =
-        PlacementUtility.createPlacementExistingDealID(
-            serviceEndPoint, auth, placementRequestEndPoint, creativeID, lineItemID);
-
-    // Save created ID's in a property file
-    ServerRequestUtility.writePropertyFile(
-        "campaignId",
-        campaignID,
-        "lineItemId",
-        lineItemID,
-        "placementId",
-        placementID,
-        "creativeId",
-        creativeID,
-        "noOfHitsImpressionURL",
-        "10",
-        System.getProperty("user.dir") + "/src/main/resources/runTimeData.Properties");
-
-    // Update earlier created Campaign, Line Item & Placement to running  - `600 status ID`
-    CampaignUtility.updateCampaign(
-        serviceEndPoint, campaignRequestEndPoint, auth, campaignID, "600");
-    LineItemUtility.updateLineItem(
-        serviceEndPoint, lineItemRequestEndPoint, auth, lineItemID, "600");
-    PlacementUtility.updatePlacement(
-        serviceEndPoint, placementRequestEndPoint, auth, placementID, "600");
+    CreativeUtility.deleteCreative(serviceEndPoint, creativeRequestEndPoint, auth, creativeID);
   }
 
   // **************** SECURE RTB TESTS ****************
@@ -121,7 +92,7 @@ public class GeneralRTBSpecRegression {
   @Test(priority = 1)
   public void verifySecureConstraint_BidSecureFalse_CreativeSecureTrue() {
 
-    // update creative seure parameter to false
+    // update creative secure parameter to false
     CreativeUtility.updateCreative(
         serviceEndPoint, creativeRequestEndPoint, auth, creativeID, "{\"secure\": true}");
 
@@ -155,7 +126,7 @@ public class GeneralRTBSpecRegression {
   @Test(priority = 3)
   public void verifySecureConstraint_BidSecureFalse_CreativeSecureFalse() {
 
-    // update creative seure parameter to false
+    // update creative secure parameter to false
     CreativeUtility.updateCreative(
         serviceEndPoint, creativeRequestEndPoint, auth, creativeID, "{\"secure\": false}");
 
@@ -292,6 +263,8 @@ public class GeneralRTBSpecRegression {
   @Test(priority = 12)
   public void verifyAPI_JS_NonRich_Creative_BidRequest_JS_0() {
 
+    String oldCreativeID = creativeID;
+
     // create a new JS creative and assign it to the placement
     creativeID = CreativeUtility.createJSCreative(serviceEndPoint, auth, creativeRequestEndPoint);
     PlacementUtility.updatePlacementWithRequestBody(
@@ -303,6 +276,9 @@ public class GeneralRTBSpecRegression {
 
     // waiting for DG
     ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
+
+    // Delete Old Creative ID
+    CreativeUtility.deleteCreative(serviceEndPoint, creativeRequestEndPoint, auth, oldCreativeID);
 
     int statusCode =
         ServerRequestUtility.postBidRequest_NoSucessCheck(

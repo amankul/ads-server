@@ -4,10 +4,10 @@ import com.phunware.ads.utilities.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
-import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -73,6 +73,7 @@ public class Capping {
         ServerRequestUtility.readDataFromPropertiesFile(
             "creativeId",
             System.getProperty("user.dir") + "/src/main/resources/runTimeData.Properties");
+
     this.serviceEndPoint = serviceEndPoint;
     this.lineItemRequestEndPoint = lineItemRequestEndPoint;
     this.placementRequestEndPoint = placementRequestEndPoint;
@@ -95,55 +96,6 @@ public class Capping {
     CampaignUtility.deleteCampaign(serviceEndPoint, campaignRequestEndPoint, auth, campaignID);
     LineItemUtility.deleteLineItem(serviceEndPoint, lineItemRequestEndPoint, auth, lineItemID);
     PlacementUtility.deletePlacement(serviceEndPoint, placementRequestEndPoint, auth, placementID);
-
-    // Create new Campaign, LineItem & Placement
-    campaignID = CampaignUtility.createCampaign(serviceEndPoint, auth, campaignRequestEndPoint);
-    lineItemID =
-        LineItemUtility.createLineItem(serviceEndPoint, auth, lineItemRequestEndPoint, campaignID);
-    placementID =
-        PlacementUtility.createPlacementExistingDealID(
-            serviceEndPoint, auth, placementRequestEndPoint, creativeID, lineItemID);
-
-    // Save created ID's in a property file
-    ServerRequestUtility.writePropertyFile(
-        "campaignId",
-        campaignID,
-        "lineItemId",
-        lineItemID,
-        "placementId",
-        placementID,
-        "creativeId",
-        creativeID,
-        "ImpressionURL",
-        impressionURL,
-        System.getProperty("user.dir") + "/src/main/resources/runTimeData.Properties");
-
-    // Update earlier created Campaign, Line Item & Placement to running  - `600 status ID`
-    CampaignUtility.updateCampaign(
-        serviceEndPoint, campaignRequestEndPoint, auth, campaignID, "600");
-    LineItemUtility.updateLineItem(
-        serviceEndPoint, lineItemRequestEndPoint, auth, lineItemID, "600");
-    PlacementUtility.updatePlacement(
-        serviceEndPoint, placementRequestEndPoint, auth, placementID, "600");
-
-    // waiting for DG
-    ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
-
-    //      // Save Impression Url, Click URl, WinNotify URL & No of times ImpressionURL is supposed
-    // to be
-    //      // hit.
-    //      ServerRequestUtility.writePropertyFile(
-    //              "impressionURL",
-    //              impressionURL,
-    //              "clickURL",
-    //              clickURL,
-    //              "winNotifyURL",
-    //              winNotifyUrl,
-    //              "noOfHitsImpressionURL",
-    //              "10",
-    //              System.getProperty("user.dir") +
-    // "/src/main/resources/BidResponseData.Properties");
-
   }
 
   // *****************  BUDGET CAP TESTS *************//
@@ -181,6 +133,8 @@ public class Capping {
     // Hitting impression url one more time to cross budget cap
     ServerRequestUtility.hitURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 1);
 
+    ServerRequestUtility.sleep(45);
+
     getDataFromAeroSpike();
 
     // Sending Bid request after the placement cap is reached.
@@ -192,7 +146,7 @@ public class Capping {
             serviceEndPoint,
             "grep \"Placement: "
                 + placementID
-                + " Constraint: BudgetConstraint\" /var/phunware/dsp/logs/abm-dsp-srv.LOG | tail -1");
+                + " Constraint: BudgetConstraint\" /var/phunware/dsp/logs/abm-dsp-srv.log | tail -1");
 
     // looking for BudgetConstraint invalidation in logs
     Assert.assertTrue(
@@ -232,6 +186,8 @@ public class Capping {
     ServerRequestUtility.hitURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 1);
     getDataFromAeroSpike();
 
+    ServerRequestUtility.sleep(45);
+
     // Sending Bid request after the placement cap is reached.
     int statusCode =
         ServerRequestUtility.postBidRequest_NoSucessCheck(runtimeEndPoint, "runTimeRequest.json");
@@ -258,29 +214,28 @@ public class Capping {
     // waiting for DG
     ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
 
-    //TODO - check the right JSON
     // posting bid request with new device ID
-    //postBidRequest("runTimeRequest_NewDeviceID1.json");
-    postBidRequest("runTimeRequest.json");
+    postBidRequest("runTimeRequest_NewDeviceID1.json");
 
     // hitting new impression url 11 times , making it go over the frequency cap "dailyFcap --> 10"
     // set earlier
     ServerRequestUtility.hitURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 11);
 
+    ServerRequestUtility.sleep(45);
+
     // Sending Bid request after the placement cap is exceeded.
     int statusCode =
-        ServerRequestUtility.postBidRequest_NoSucessCheck(
-            runtimeEndPoint, "runTimeRequest_NewDeviceID1.json");
+        ServerRequestUtility.postBidRequest_NoSucessCheck(runtimeEndPoint, "runTimeRequest_NewDeviceID1.json");
     Assert.assertEquals(
         statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
 
-    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.LOG
+    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
     String data =
         ServerRequestUtility.waitForLogsToGetPopulated(
             serviceEndPoint,
             "grep \"Placement: "
                 + placementID
-                + " Constraint: DeviceFrequencyCapConstraint is INVALID\" /var/phunware/dsp/logs/abm-dsp-srv.LOG | tail -1");
+                + " Constraint: DeviceFrequencyCapConstraint is INVALID\" /var/phunware/dsp/logs/abm-dsp-srv.log | tail -1");
 
     // looking for BudgetConstraint invalidation in logs
     // Expecting "Placement: placementID Constraint: DeviceFrequencyCapConstraint is INVALID"
@@ -334,7 +289,6 @@ public class Capping {
 
     // POST REQUEST TO DSP SERVER, CAPTURE DATA
     HashMap<String, String> result = ServerRequestUtility.postBidRequest(runtimeEndPoint, fileName);
-    Assert.assertTrue(result.size() == 3, "Bid Request is not successful");
     for (HashMap.Entry<String, String> entry : result.entrySet()) {
       if (entry.getKey().equals("impressionURL")) {
         impressionURL = entry.getValue();
