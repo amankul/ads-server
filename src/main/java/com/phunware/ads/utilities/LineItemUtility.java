@@ -23,6 +23,7 @@ public class LineItemUtility {
   private static String startDate;
   private static String endDate;
 
+  //Creates a new line Item
   public static String createLineItem(
       String serviceEndPoint, String auth, String lineItemRequestEndPoint, String campaignID) {
 
@@ -72,6 +73,7 @@ public class LineItemUtility {
     return lineItemID;
   }
 
+  //Delete A line Item
   public static void deleteLineItem(
       String serviceEndPoint, String lineItemRequestEndPoint, String auth, String lineItemID) {
 
@@ -96,6 +98,7 @@ public class LineItemUtility {
     LOG.info("Deleted LineItem - " + lineItemID);
   }
 
+  //Update Line Item Status
   public static void updateLineItem(
       String serviceEndPoint,
       String lineItemRequestEndPoint,
@@ -125,6 +128,7 @@ public class LineItemUtility {
     LOG.info("Updated LineItem ID - " + lineItemID + ", Status Updated to - " + statusID);
   }
 
+  //Update Line Item based on the request body sent to it as one of te parameter
   public static void updateLineItemUsingRequestBody(
       String serviceEndPoint,
       String lineItemRequestEndPoint,

@@ -60,6 +60,8 @@ public class AdsServerUtility {
     }
   }
 
+  // Logs into ADS server based on the environment tests are run, executes a shell command and
+  // returns response
   public static String logInToServerExecuteShellCommandAndReturnResponse(
       String serviceEndPoint, String shellCommand) {
 
@@ -146,6 +148,7 @@ public class AdsServerUtility {
     return output;
   }
 
+  // Update Log4J logging level to trace
   public static void updateLog4jLoggingLevel(String serviceEndPoint, String loggerLevel) {
 
     String log4j2Path = "/opt/phunware/dsp/current/log4j2.xml";
@@ -160,6 +163,8 @@ public class AdsServerUtility {
     LOG.info("Updated Logger level to - " + loggerLevel);
   }
 
+  // Writes contents of .pem file into local during test run, This is required for jSCH multi
+  // tunneling
   public static void writeToFile(String data) {
 
     try {

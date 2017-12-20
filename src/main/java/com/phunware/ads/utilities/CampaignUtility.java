@@ -22,6 +22,7 @@ public class CampaignUtility {
   private static int customerID;
   private static int advertiserID;
 
+  //Creates new Campaign
   public static String createCampaign(
       String serviceEndPoint, String auth, String campaignRequestEndPoint) {
 
@@ -67,6 +68,7 @@ public class CampaignUtility {
     return campaignID;
   }
 
+  //Delete Campaign
   public static void deleteCampaign(
       String serviceEndPoint, String campaignRequestEndPoint, String auth, String campaignID) {
 
@@ -88,6 +90,7 @@ public class CampaignUtility {
     LOG.info("Deleted Campaign ID - " + campaignID);
   }
 
+  //Update campaign status
   public static void updateCampaign(
       String serviceEndPoint,
       String campaignRequestEndPoint,
@@ -114,6 +117,7 @@ public class CampaignUtility {
     LOG.info("Updated Campaign ID - " + campaignID + ", Status Updated to - " + statusID);
   }
 
+  //Update campaign based on the request body sent as one of the parameters
   public static void updateCampaignUsingRequestBody(
       String serviceEndPoint,
       String campaignRequestEndPoint,
@@ -140,6 +144,7 @@ public class CampaignUtility {
     LOG.info("Updated Campaign ID - " + campaignID);
   }
 
+  //Gets Advertiser ID from DB
   public static int getAdvertiserID(String serviceEndPoint) {
     String sqlQuery = "select id from advertiser where is_active = 1 limit 1";
     dbResult =
@@ -147,6 +152,7 @@ public class CampaignUtility {
     return Integer.valueOf(dbResult.get(0));
   }
 
+  //gets Customer ID from DB
   public static int getCustomerID(String serviceEndPoint) {
     String sqlQuery_customer = "select id from customer where status_id not in (100) limit 1";
     dbResult =

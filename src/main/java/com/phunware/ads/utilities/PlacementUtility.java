@@ -20,6 +20,7 @@ public class PlacementUtility {
   private static String randomValue;
   private static String placementID;
 
+  //Creates a new Placement
   public static String createPlacement(
       String serviceEndPoint,
       String auth,
@@ -37,13 +38,13 @@ public class PlacementUtility {
                     + "/src/main/java/com/phunware/ads/json/placement.json")
             .replaceAll("creativeIDsToBeChanged", creativeID)
             .replaceAll("lineItemIDToBeChanged", lineItemID)
-                .replaceAll("DealIDAutomation","DealIDAutomation"+ randomValue)
+            .replaceAll("DealIDAutomation", "DealIDAutomation" + randomValue)
             .replaceAll("nameToBeChanged", randomValue);
 
     writePropertyFile(
-            "randomValue",
-            randomValue,
-            System.getProperty("user.dir") + "/src/main/resources/random.Properties");
+        "randomValue",
+        randomValue,
+        System.getProperty("user.dir") + "/src/main/resources/random.Properties");
 
     // Printing Request Details
     LOG.debug("REQUEST-URL:POST-" + requestURL);
@@ -73,29 +74,31 @@ public class PlacementUtility {
     return placementID;
   }
 
-
+  //Creates a new placement using an existing deal ID
   public static String createPlacementExistingDealID(
-          String serviceEndPoint,
-          String auth,
-          String placementRequestEndPoint,
-          String creativeID,
-          String lineItemID) {
+      String serviceEndPoint,
+      String auth,
+      String placementRequestEndPoint,
+      String creativeID,
+      String lineItemID) {
 
     initializeData(serviceEndPoint);
 
-    String randomvalue = PropertiesFileUtility.readDataFromPropertiesFile("randomValue",System.getProperty("user.dir") + "/src/main/resources/random.Properties");
+    String randomvalue =
+        PropertiesFileUtility.readDataFromPropertiesFile(
+            "randomValue",
+            System.getProperty("user.dir") + "/src/main/resources/random.Properties");
 
     // Request Details
     String requestURL = serviceEndPoint + placementRequestEndPoint;
     String requestBody =
-            JsonUtilities.jsonToString(
-                    System.getProperty("user.dir")
-                            + "/src/main/java/com/phunware/ads/json/placement.json")
-                    .replaceAll("creativeIDsToBeChanged", creativeID)
-                    .replaceAll("lineItemIDToBeChanged", lineItemID)
-                    .replaceAll("DealIDAutomation","DealIDAutomation"+randomvalue)
-                    .replaceAll("nameToBeChanged", randomvalue);
-
+        JsonUtilities.jsonToString(
+                System.getProperty("user.dir")
+                    + "/src/main/java/com/phunware/ads/json/placement.json")
+            .replaceAll("creativeIDsToBeChanged", creativeID)
+            .replaceAll("lineItemIDToBeChanged", lineItemID)
+            .replaceAll("DealIDAutomation", "DealIDAutomation" + randomvalue)
+            .replaceAll("nameToBeChanged", randomvalue);
 
     // Printing Request Details
     LOG.debug("REQUEST-URL:POST-" + requestURL);
@@ -103,16 +106,16 @@ public class PlacementUtility {
 
     // Extracting response after status code validation
     Response response =
-            given()
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", auth)
-                    .request()
-                    .body(requestBody)
-                    .post(requestURL)
-                    .then()
-                    .statusCode(201)
-                    .extract()
-                    .response();
+        given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", auth)
+            .request()
+            .body(requestBody)
+            .post(requestURL)
+            .then()
+            .statusCode(201)
+            .extract()
+            .response();
 
     // printing response
     LOG.debug("RESPONSE:" + response.asString());
@@ -125,6 +128,7 @@ public class PlacementUtility {
     return placementID;
   }
 
+  //Delete placement
   public static void deletePlacement(
       String serviceEndPoint, String placementRequestEndPoint, String auth, String placementID) {
 
@@ -149,8 +153,9 @@ public class PlacementUtility {
     LOG.info("Deleted Placement ID - " + placementID);
   }
 
+  //get Placement Details
   public static void getPlacement(
-          String serviceEndPoint, String placementRequestEndPoint, String auth, String placementID) {
+      String serviceEndPoint, String placementRequestEndPoint, String auth, String placementID) {
 
     // Request Details
     String requestURL = serviceEndPoint + placementRequestEndPoint + "/" + placementID;
@@ -160,20 +165,21 @@ public class PlacementUtility {
 
     // Extracting response after status code validation
     Response response =
-            given()
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", auth)
-                    .request()
-                    .get(requestURL)
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .response();
+        given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", auth)
+            .request()
+            .get(requestURL)
+            .then()
+            .statusCode(200)
+            .extract()
+            .response();
 
     LOG.info("Getting details for Placement ID - " + placementID);
     LOG.info(response.asString());
   }
 
+  //Update placement status ID
   public static void updatePlacement(
       String serviceEndPoint,
       String placementRequestEndPoint,
@@ -203,6 +209,7 @@ public class PlacementUtility {
     LOG.info("Updated Placement ID - " + placementID + ", Status Updated to - " + statusID);
   }
 
+  //Update placement based on the request body sent to it as one of the parameter
   public static void updatePlacementWithRequestBody(
       String serviceEndPoint,
       String placementRequestEndPoint,
@@ -215,7 +222,7 @@ public class PlacementUtility {
 
     // Printing Request Details
     LOG.info("REQUEST-URL:PUT - " + requestURL);
-    LOG.info("REQUEST BODY - "+ requestBody);
+    LOG.info("REQUEST BODY - " + requestBody);
 
     // Extracting response after status code validation
     Response response =
@@ -233,6 +240,7 @@ public class PlacementUtility {
     LOG.info("Updated Placement ID - " + placementID);
   }
 
+  //get placement status
   public static int getStatusId(
       String serviceEndPoint, String placementRequestEndPoint, String auth, String placementID) {
 
@@ -263,10 +271,7 @@ public class PlacementUtility {
     randomValue = "Placement" + LocalDateTime.now().toString().replaceAll("[-:.T]", "");
   }
 
-  public static void writePropertyFile(
-          String key,
-          String value,
-          String filePath) {
+  public static void writePropertyFile(String key, String value, String filePath) {
 
     Properties prop = new Properties();
     OutputStream output = null;

@@ -34,8 +34,8 @@ public class MySqlUtility {
   // Initiating Logger Object
   private static final Logger log = LogManager.getLogger();
 
-  // Use this to connect to mySQL db via jump server , send sql query and retrieve each row as an
-  // arraylist element
+  // Connect to mySQL db via jump server, sends sql query and retrieves each row as an
+  // Arraylist element
   public static ArrayList query_Post_connection_To_MySQL_Via_JumpServer(
       String dbQuery, String serviceEndPoint) {
 

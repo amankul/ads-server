@@ -2,6 +2,7 @@ package com.phunware.ads.tests;
 
 import com.phunware.ads.utilities.AeroSpikeUtility;
 import com.phunware.ads.utilities.ServerRequestUtility;
+import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
@@ -12,6 +13,8 @@ import org.testng.annotations.Test;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.hamcrest.Matchers.is;
 
 public class CostSpendAndEventLogging {
 
@@ -27,13 +30,17 @@ public class CostSpendAndEventLogging {
   private static String winNotifyURL;
   private static String transactionID;
   private static int expectedImpressions;
+  private static int expectedClicks;
+  private static int expectedWinNotify;
+  private static int expectedConversions;
+
   private static int noOfImpressions;
   private static String auth;
+  private static Response esData;
 
   // retailrateLineItem & bidPlacement values are taken from the Lineitem and Placement created.
   private static double retailRateLineItem = 5.00;
   private static double auctionPrice = 1.50;
-
   private static double aerospikeCost;
   private static double expectedCost;
   private static double aerospikeSpend;
@@ -60,43 +67,19 @@ public class CostSpendAndEventLogging {
 
     this.auth = auth;
     this.serviceEndPoint = serviceEndPoint;
+    expectedClicks = 5;
+    expectedWinNotify = 1;
+    expectedConversions = 1;
 
     // capture ID's from properties file.
     placementID =
         ServerRequestUtility.readDataFromPropertiesFile(
-            "placementId",
-            System.getProperty("user.dir") + "/src/main/resources/runTimeData.Properties");
+                "placementId",
+                System.getProperty("user.dir") + "/src/main/resources/runTimeData.Properties")
+            .trim();
 
     String todaysDate = LocalDateTime.now().toString().replaceAll("[-:.T]", "").substring(0, 8);
     LOG.info("Aerospike Key - " + "sd:plac" + placementID + ":" + todaysDate);
-
-    // capture and Hit URL's after replacing auction price
-    impressionURL =
-        ServerRequestUtility.readDataFromPropertiesFile(
-            "impressionURL",
-            System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties");
-    LOG.info("Impression URL - " + impressionURL);
-    ServerRequestUtility.hitURL(impressionURL.replace("${AUCTION_PRICE}", "1.5"), 10);
-
-    clickURL =
-        ServerRequestUtility.readDataFromPropertiesFile(
-            "clickURL",
-            System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties");
-    LOG.info("Click URL - " + clickURL);
-    ServerRequestUtility.hitURL(clickURL.replace("${AUCTION_PRICE}", "1.5"), 5);
-
-    winNotifyURL =
-        ServerRequestUtility.readDataFromPropertiesFile(
-            "winNotifyURL",
-            System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties");
-    LOG.info("Win Notify URL - " + winNotifyURL);
-    ServerRequestUtility.hitURL(winNotifyURL.replace("${AUCTION_PRICE}", "1.5"), 5);
-
-    transactionID =
-        ServerRequestUtility.readDataFromPropertiesFile(
-            "transactionID",
-            System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties");
-    ServerRequestUtility.hitConversionURL(transactionID, runtimeEndPoint, 5);
 
     expectedImpressions =
         Integer.parseInt(
@@ -104,6 +87,39 @@ public class CostSpendAndEventLogging {
                 "noOfHitsImpressionURL",
                 System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties"));
     LOG.info("Expected impressions - " + expectedImpressions);
+
+    // capture and Hit URL's after replacing auction price
+    impressionURL =
+        ServerRequestUtility.readDataFromPropertiesFile(
+                "impressionURL",
+                System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties")
+            .trim();
+    LOG.info("Impression URL - " + impressionURL);
+    ServerRequestUtility.hitURL(
+        impressionURL.replace("${AUCTION_PRICE}", "1.5"), expectedImpressions);
+
+    clickURL =
+        ServerRequestUtility.readDataFromPropertiesFile(
+                "clickURL",
+                System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties")
+            .trim();
+    LOG.info("Click URL - " + clickURL);
+    ServerRequestUtility.hitURL(clickURL.replace("${AUCTION_PRICE}", "1.5"), expectedClicks);
+
+    transactionID =
+        ServerRequestUtility.readDataFromPropertiesFile(
+                "transactionID",
+                System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties")
+            .trim();
+    ServerRequestUtility.hitConversionURL(transactionID, runtimeEndPoint, expectedConversions);
+
+    winNotifyURL =
+        ServerRequestUtility.readDataFromPropertiesFile(
+                "winNotifyURL",
+                System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties")
+            .trim();
+    LOG.info("Win Notify URL - " + winNotifyURL);
+    ServerRequestUtility.hitURL(winNotifyURL.replace("${AUCTION_PRICE}", "1.5"), expectedWinNotify);
 
     ServerRequestUtility.sleep(45);
 
@@ -173,12 +189,36 @@ public class CostSpendAndEventLogging {
   }
 
   //  ******** EventLogging Tests *******
-  /*
-  TODO - Event logging functionality is not working as expected on stage.
-  */
 
+  /*
+   Verify Number of clicks, for a placement in ElasticSearch.
+  */
   @Test(priority = 4)
-  public void verifyES() {
-    ServerRequestUtility.getPlacementDataFromELasticSearch(serviceEndPoint, placementID, auth);
+  public void verifyES_Clicks() {
+    esData =
+        ServerRequestUtility.getPlacementDataFromELasticSearch(serviceEndPoint, placementID, auth);
+    esData.then().body("data.numClicks[0]", is(expectedClicks));
+  }
+  /*
+   Verify Number of Impressions, for a placement in ElasticSearch.
+  */
+  @Test(priority = 5)
+  public void verifyES_Impressions() {
+    esData.then().body("data.numImpressions[0]", is(expectedImpressions));
+  }
+
+  /*
+   Verify Number of Win Notifications, for a placement in ElasticSearch.
+  */
+  @Test(priority = 6)
+  public void verifyES_numWinNotifications() {
+    esData.then().body("data.numWinNotifications[0]", is(expectedWinNotify));
+  }
+  /*
+   Verify Number of conversions, for a placement in ElasticSearch.
+  */
+  @Test(priority = 7)
+  public void verifyES_numConversions() {
+    esData.then().body("data.numConversions[0]", is(expectedConversions));
   }
 }

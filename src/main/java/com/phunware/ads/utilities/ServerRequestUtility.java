@@ -1,11 +1,12 @@
 package com.phunware.ads.utilities;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public class ServerRequestUtility {
   private static final Logger LOG = LogManager.getLogger();
   private static String randomValue;
 
+  //Send a Bid request, verify status code and capture clickURL, Impression URL, WinNotify URL & Transaction ID in a hask map and return it.
   public static HashMap<String, String> postBidRequest(String runtimeEndPoint, String fileName) {
 
     // Request Details
@@ -61,7 +63,8 @@ public class ServerRequestUtility {
     String winNotifyUrl =
         response.then().extract().path("seatbid.bid.nurl").toString().replaceAll("[\\[\\]]", "");
     String clickAndImpressionURL = response.then().extract().path("seatbid.bid.adm").toString();
-    String transactionID = response.then().extract().path("seatbid.bid.id").toString();
+    String transactionID =
+        response.then().extract().path("seatbid.bid.id").toString().replaceAll("[\\[\\]]", "");
 
     // parsing data
     HashMap<String, String> result = new HashMap<>();
@@ -83,6 +86,7 @@ public class ServerRequestUtility {
     return result;
   }
 
+  //Send a bid request
   public static int postBidRequest_NoSucessCheck(String runtimeEndPoint, String fileName) {
 
     // Request Details
@@ -120,6 +124,7 @@ public class ServerRequestUtility {
     return response.statusCode();
   }
 
+  //Pull data from DB to ADS server
   public static void pullDataToAdsServer(String serviceEndPoint) {
     AdsServerUtility.logInToServerExecuteShellCommandAndReturnResponse(
         serviceEndPoint, "touch /var/phunware/dsp/data/placements/v1/placements.md5");
@@ -145,6 +150,7 @@ public class ServerRequestUtility {
     }
   }
 
+  //Waiting for the server logs to get populated after sending a shell command.
   public static String waitForLogsToGetPopulated(String serviceEndPoint, String command) {
 
     int retry = 6;
@@ -167,6 +173,7 @@ public class ServerRequestUtility {
     return "No data found for placement in /var/phunware/dsp/logs/abm-dsp-srv.log";
   }
 
+  //Invoke Data Generator via API call
   public static void invokeDataGenerator(String serviceEndPoint, String auth) {
 
     LOG.info("Invoking Data Generator");
@@ -191,6 +198,7 @@ public class ServerRequestUtility {
     LOG.debug("RESPONSE TIME :" + response.time() / 1000.0 + " Seconds");
   }
 
+  //Writes 5 key value pairs to a property file
   public static void writePropertyFile(
       String key,
       String value,
@@ -225,6 +233,7 @@ public class ServerRequestUtility {
     }
   }
 
+  //reads data from a property file
   public static String readDataFromPropertiesFile(String propertyName, String filePath) {
 
     Properties pro = null;
@@ -242,33 +251,43 @@ public class ServerRequestUtility {
     return pro.getProperty(propertyName);
   }
 
+  //Hit URL using OkHttpClient
   public static void hitURL(String url, int numOfHits) {
 
     LOG.info("Hitting URL - " + url);
-    LOG.info(numOfHits + " Times");
-
     for (int i = 0; i < numOfHits; i++) {
-      given().header("Content-Type", "application/json").request().get(url);
+      OkHttpClient client = new OkHttpClient();
+      Request request = new Request.Builder().url(url).get().build();
+      try {
+        client.newCall(request).execute();
+        LOG.info("URL hit " + i + "Times");
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      ServerRequestUtility.sleep(3);
     }
-
-    LOG.info("URL is hit " + numOfHits + " Times");
   }
 
+  //Hit Conversion URL using OkHttpClient
   public static void hitConversionURL(String transactionID, String runtimeEndPoint, int numOfHits) {
 
     String url = runtimeEndPoint.replaceAll("bidRequest", "conversion?tx=" + transactionID);
     LOG.info("Hitting Conversion URL - " + url);
-    LOG.info(numOfHits + " Times");
 
     for (int i = 0; i < numOfHits; i++) {
-      given()
-          .header("Content-Type", "application/json")
-          .request()
-          .get(url);
+      OkHttpClient client = new OkHttpClient();
+      Request request = new Request.Builder().url(url).get().build();
+      try {
+        client.newCall(request).execute();
+        LOG.info("URL hit " + i + "Times");
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      ServerRequestUtility.sleep(3);
     }
-    LOG.info("Conversion URL is hit " + numOfHits + " Times");
   }
 
+  //Wait for the data generator to pull data to Ads Server
   public static void waitForDataGenerator(String serviceEndPoint, String auth) {
 
     // Invoking DG
@@ -282,7 +301,7 @@ public class ServerRequestUtility {
 
   // Sleep
   public static void sleep(int seconds) {
-    LOG.info("Wait time -"+seconds+ " Seconds");
+    LOG.info("Wait time -" + seconds + " Seconds");
 
     try {
       Thread.sleep(seconds * 1000);
@@ -291,26 +310,37 @@ public class ServerRequestUtility {
     }
   }
 
-  public static String getPlacementDataFromELasticSearch(String serviceEndPoint, String placementID, String auth){
+  //get Placement data from Elastic searc using reporting API endpoint
+  public static Response getPlacementDataFromELasticSearch(
+      String serviceEndPoint, String placementID, String auth) {
 
-    //Using reporting API
-    Long startOfToday =  LocalDate.now().atStartOfDay(ZoneId.of("UTC")).toEpochSecond() * 1000;
-    Long endOfToday =  Instant.now().toEpochMilli();
+    // Using reporting API
+    Long startOfToday = LocalDate.now().atStartOfDay(ZoneId.of("UTC")).toEpochSecond() * 1000;
+    Long endOfToday =
+        LocalDate.now().plusDays(1).atStartOfDay(ZoneId.of("UTC")).toEpochSecond() * 1000;
 
-    String url = serviceEndPoint + "/api/v1.0/metrics/placements?pids=" + placementID +"&stdt="+startOfToday+"&endt="+endOfToday;
+    String url =
+        serviceEndPoint
+            + "/api/v1.0/metrics/placements?pids="
+            + placementID
+            + "&stdt="
+            + startOfToday
+            + "&endt="
+            + endOfToday;
 
-    LOG.info("URL -"+url);
+    LOG.info("URL -" + url);
 
-    Response response =  given()
+    Response response =
+        given()
             .header("Content-Type", "application/json")
-             .header("Authorization",auth)
+            .header("Authorization", auth)
             .request()
             .get(url)
             .then()
-            .extract().response();
+            .extract()
+            .response();
 
-    LOG.info("Captured ES data - "+ response.asString());
-    return response.asString();
-
+    LOG.info("Captured ES data - " + response.asString());
+    return response;
   }
 }

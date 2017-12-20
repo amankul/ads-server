@@ -18,6 +18,7 @@ public class CreativeUtility {
   private static ArrayList<String> dbResult;
   private static String advertiserId;
 
+  //Create a new Banner Creative
   public static String createCreative(
       String serviceEndPoint, String auth, String creativeRequestEndPoint) {
 
@@ -60,6 +61,7 @@ public class CreativeUtility {
     return creativeID;
   }
 
+  //Create a new JS Creative
   public static String createJSCreative(
       String serviceEndPoint, String auth, String creativeRequestEndPoint) {
 
@@ -102,6 +104,7 @@ public class CreativeUtility {
     return creativeID;
   }
 
+  //Delete Creative
   public static void deleteCreative(
       String serviceEndPoint, String creativeRequestEndPoint, String auth, String creativeID) {
 
@@ -126,6 +129,7 @@ public class CreativeUtility {
     LOG.info("Deleted Creative ID - " + creativeID);
   }
 
+  //Update creative status
   public static void updateCreative(
       String serviceEndPoint,
       String creativeRequestEndPoint,
@@ -155,6 +159,7 @@ public class CreativeUtility {
     LOG.info("Updated Creative ID - " + creativeID + ", With request body - " + requestBody);
   }
 
+  //get Creative details
   public static void getCreative(
       String serviceEndPoint, String creativeRequestEndPoint, String auth, String creativeID) {
 

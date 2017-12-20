@@ -67,6 +67,8 @@ public class AeroSpikeUtility {
     }
   }
 
+  // Logs into Aerospike server based on the environment tests are run, executes aql command and
+  // returns response
   public static String LogInToAerospikeExecuteAqlQueryAndReturnResponse(
       String env, String nameSpace, String setName, String aerospikeRecordkey) {
 
@@ -106,7 +108,7 @@ public class AeroSpikeUtility {
 
       // writing data to pem file
       // Note: data will be flushed out as soon as this method done executing.
-      writeToFile(result);
+      AdsServerUtility.writeToFile(result);
 
       // using a .pem file to get access to ssh
       String pemFileLocation = System.getProperty("user.dir") + "/src/main/resources/pemfile.pem";
@@ -142,21 +144,9 @@ public class AeroSpikeUtility {
       aerospikeserverSession.disconnect();
       jumpServerSession.disconnect();
       // flushing contents from pem file
-      writeToFile("");
+      AdsServerUtility.writeToFile("");
     }
 
     return aerospikeResult;
-  }
-
-  public static void writeToFile(String data) {
-
-    try {
-      File myPemFile = new File(System.getProperty("user.dir") + "/src/main/resources/pemfile.pem");
-      FileOutputStream pemFileStream = new FileOutputStream(myPemFile, false); // true to append
-      pemFileStream.write(data.getBytes());
-      pemFileStream.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 }
