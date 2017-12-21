@@ -192,7 +192,7 @@ public class Capping {
     int statusCode =
         ServerRequestUtility.postBidRequest_NoSucessCheck(runtimeEndPoint, "runTimeRequest.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // *****************  FREQUENCY CAP TESTS *************//
@@ -255,7 +255,7 @@ public class Capping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "runTimeRequest_NewDeviceID2.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // *****************  CAPPING UTILITY METHODS *************//

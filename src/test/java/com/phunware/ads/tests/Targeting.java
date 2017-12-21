@@ -169,7 +169,7 @@ public class Targeting {
         System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties");
   }
 
-  // ================================== PLACEMENT CONSTRAINTS ============================================= //
+  // ================================== PLACEMENT CONSTRAINTS  ============================================= //
 
   /*
   Verify successful Country Constraint validation in logs  by sending a bid request that would match the placement created during the test run.
@@ -420,7 +420,7 @@ public class Targeting {
     creativeConstraintValidator("SecureConstraint");
   }
 
-  // ================================== UTILITY METHODS  ============================================= //
+  // ================================== UTILITY METHODS ============================================= //
 
   public static void placementConstraintValidator(String regexSubString) {
 

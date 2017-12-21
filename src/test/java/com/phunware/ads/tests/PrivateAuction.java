@@ -242,7 +242,7 @@ public class PrivateAuction {
             runtimeEndPoint,
             "PmpRunTimeRequest/PrivateAuctionFalse_BidFloorLessThanPlacementBidRequest.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
 
     ServerRequestUtility.sleep(45);
   }
@@ -345,7 +345,7 @@ public class PrivateAuction {
             runtimeEndPoint,
             "PmpRunTimeRequest/PrivateAuctionFalse_BidFloorLessThanPlacementBidRequest.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // ********** UTILITY METHODS *********** //

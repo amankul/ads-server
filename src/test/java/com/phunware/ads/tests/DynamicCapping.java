@@ -139,7 +139,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest.json");
     Assert.assertEquals(
-        statusCode, 200, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -159,7 +159,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest.json");
     Assert.assertEquals(
-        statusCode, 204, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -198,7 +198,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest_newBundleID1.json");
     Assert.assertEquals(
-        statusCode, 200, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -218,7 +218,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest_newBundleID1.json");
     Assert.assertEquals(
-        statusCode, 204, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // *************** eCPA *************** //
@@ -263,7 +263,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest_newBundleID2.json");
     Assert.assertEquals(
-        statusCode, 200, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -283,7 +283,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest_newBundleID2.json");
     Assert.assertEquals(
-        statusCode, 204, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -326,7 +326,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest_newBundleID3.json");
     Assert.assertEquals(
-        statusCode, 200, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -346,7 +346,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest_newBundleID3.json");
     Assert.assertEquals(
-        statusCode, 204, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // *************** CTR *************** //
@@ -390,7 +390,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest_newBundleID4.json");
     Assert.assertEquals(
-        statusCode, 204, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -412,7 +412,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest_newBundleID4.json");
     Assert.assertEquals(
-        statusCode, 200, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -454,7 +454,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest_newBundleID5.json");
     Assert.assertEquals(
-        statusCode, 204, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -476,7 +476,7 @@ public class DynamicCapping {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "DynamicCapping/runTimeRequest_newBundleID5.json");
     Assert.assertEquals(
-        statusCode, 200, "Placement -" + placementID + " Logs -" + getLogData(placementID));
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // *********** UTILITY METHODS ************ //
@@ -517,8 +517,4 @@ public class DynamicCapping {
         System.getProperty("user.dir") + "/src/main/resources/BidResponseData.Properties");
   }
 
-  public String getLogData(String placementID) {
-    return AdsServerUtility.logInToServerExecuteShellCommandAndReturnResponse(
-        serviceEndPoint, "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep " + placementID);
-  }
 }

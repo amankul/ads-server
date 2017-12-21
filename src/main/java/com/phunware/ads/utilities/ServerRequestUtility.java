@@ -343,4 +343,9 @@ public class ServerRequestUtility {
     LOG.info("Captured ES data - " + response.asString());
     return response;
   }
+
+  public static String getLogData(String serviceEndPoint, String placementID) {
+    return AdsServerUtility.logInToServerExecuteShellCommandAndReturnResponse(
+            serviceEndPoint, "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep " + placementID);
+  }
 }

@@ -105,7 +105,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/Secure/secureFalse.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -117,7 +117,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/Secure/secureTrue.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -140,7 +140,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/Secure/secureTrue.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -153,7 +153,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/Secure/secureFalse.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // **************** MimeType RTB Tests ****************
@@ -168,7 +168,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/MimeType/MimeGif.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -181,7 +181,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/MimeType/MimeJPG.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // ****************  Dimension RTB Tests ********************
@@ -196,7 +196,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/Dimension/Dimension320X50.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -209,7 +209,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/Dimension/Dimension320X480.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // ****************  Battr RTB Tests ********************
@@ -224,7 +224,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/Battr/BattrID_1.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204,ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -237,7 +237,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/Battr/BattrID_4_5.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // ****************  BTYPE RTB Test ********************
@@ -252,7 +252,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/BType/BType_2_Banner.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // ****************  API RTB Tests ********************
@@ -284,7 +284,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/API_JavaScript/JS_0.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -297,7 +297,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/API_JavaScript/JS_1.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -317,7 +317,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/API_JavaScript/JS_0.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -330,7 +330,7 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/API_JavaScript/JS_1.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -350,27 +350,20 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/API_JavaScript/JS_0_API_3_5.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
-  Verify API/JS when creative is JS(MRAID), bid request JS is 0 and bidrequest has framwork ID 3 or 5 , Expected - bid request should  serve
+  Verify API/JS when creative is JS(MRAID), bid request JS is 1 and bidrequest has framwork ID 3 or 5 , Expected - bid request should  serve
   */
   @Test(priority = 17)
   public void verifyAPI_JS_MRAID_Creative_BidRequest_JS_1_API_3_5() {
-
-    // Update  JS creative to "mediaCapabilityId": 3 - IN APP RICH MEDIA
-    CreativeUtility.updateCreative(
-        serviceEndPoint, creativeRequestEndPoint, auth, creativeID, "{\"mediaCapabilityId\": 3}");
-
-    // waiting for DG
-    ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
 
     int statusCode =
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/API_JavaScript/JS_1_API_3_5.json");
     Assert.assertEquals(
-        statusCode, 200, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 200, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -379,18 +372,11 @@ public class GeneralRTBSpecRegression {
   @Test(priority = 18)
   public void verifyAPI_JS_MRAID_Creative_BidRequest_JS_0_API_1_2_4() {
 
-    // Update  JS creative to "mediaCapabilityId": 3 - IN APP RICH MEDIA
-    CreativeUtility.updateCreative(
-        serviceEndPoint, creativeRequestEndPoint, auth, creativeID, "{\"mediaCapabilityId\": 3}");
-
-    // waiting for DG
-    ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
-
     int statusCode =
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/API_JavaScript/JS_0_API_1_2_4.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   /*
@@ -399,18 +385,11 @@ public class GeneralRTBSpecRegression {
   @Test(priority = 19)
   public void verifyAPI_JS_MRAID_Creative_BidRequest_JS_1_API_1_2_4() {
 
-    // Update  JS creative to "mediaCapabilityId": 3 - IN APP RICH MEDIA
-    CreativeUtility.updateCreative(
-        serviceEndPoint, creativeRequestEndPoint, auth, creativeID, "{\"mediaCapabilityId\": 3}");
-
-    // waiting for DG
-    ServerRequestUtility.waitForDataGenerator(serviceEndPoint, auth);
-
     int statusCode =
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/API_JavaScript/JS_1_API_1_2_4.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
 
   // ****************  BTYPE RTB Tests ********************
@@ -425,6 +404,8 @@ public class GeneralRTBSpecRegression {
         ServerRequestUtility.postBidRequest_NoSucessCheck(
             runtimeEndPoint, "RTBSpecRegression/BType/BType_3_JavaScript.json");
     Assert.assertEquals(
-        statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
+        statusCode, 204, ServerRequestUtility.getLogData(serviceEndPoint,placementID));
   }
+
+
 }
