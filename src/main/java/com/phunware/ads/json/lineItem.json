@@ -1,0 +1,11 @@
+{
+  "budgetDaily": "budgetDailyToBeChanged",
+  "lineItemTypeId": "lineItemTypeIdToBeChanged",
+  "campaignId": "campaignIdToBeChanged",
+  "name": "LineItemNameToBeChanged",
+  "defaultProfitPrct": "defaultProfitPrctToBeChanged",
+  "retailRate": "retailRateToBeChanged",
+  "salesforceId": "salesforceIdToBeChanged",
+  "startDate": "startDateToBeChanged",
+  "endDate": "endDateToBeChanged"
+}

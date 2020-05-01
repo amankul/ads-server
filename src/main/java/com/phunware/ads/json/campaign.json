@@ -1,0 +1,10 @@
+{
+  "customerId": "customerIdToBeChanged",
+  "advertiserId": "advertiserIdToBeChanged",
+  "categoryIds": [1, 2, 3, 4, 5 ,6],
+  "campaignManagerUserId": 1,
+  "budgetTotal": 100.03,
+  "name": "nameToBeChanged",
+  "startDate": "startDateToBeChanged",
+  "endDate": "endDateToBeChanged"
+}

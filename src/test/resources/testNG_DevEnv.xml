@@ -1,0 +1,23 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="ADS SERVER API TEST SUITE">
+
+	<parameter name="serviceEndPoint" value="http://dsp-testapi-dev.phunware.com" />
+	<parameter name="runtimeEndPoint" value="http://dsp-test-dev.phunware.com/bidRequest" />
+	<parameter name="auth" value="Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE0ODk2MTU4MTYsImV4cCI6MTUyMTE1MTgxNiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsIkdpdmVuTmFtZSI6IkpvaG5ueSIsIlN1cm5hbWUiOiJSb2NrZXQiLCJFbWFpbCI6Impyb2NrZXRAZXhhbXBsZS5jb20iLCJSb2xlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.4-fKE0EfQOeTykzCPbLvX-7knmt8yVQ9_njRGrPuHr0" />
+	<parameter name="authExpired" value="Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE0OTkzNzE0NjksImV4cCI6MTQ5OTM3MjY3NiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSJ9.yWT5TTUWjT9rTwHyHEM5pXYUm5Hb8oaaRKUMosgFG2s"/>
+
+
+	<test name=" SERVER API ">
+		<parameter name="campaignRequestEndPoint" value="/api/v1.0/campaigns"/>
+		<parameter name="lineItemRequestEndPoint" value="/api/v1.0/lineitems"/>
+		<parameter name="placementRequestEndPoint" value="/api/v1.0/placements"/>
+		<parameter name="creativeRequestEndPoint" value="/api/v1.0/creatives"/>
+
+		<classes>
+			<class name="com.phunware.ads.tests.Targeting"/>
+			<class name="com.phunware.ads.tests.CostAndSpend"/>
+			<class name="com.phunware.ads.tests.Capping"/>
+		</classes>
+	</test>
+</suite>
