@@ -1,4 +1,4 @@
-package com.phunware.ads.utilities;
+package com.org.ads.utilities;
 
 import com.jcraft.jsch.*;
 import org.apache.logging.log4j.LogManager;
@@ -35,12 +35,12 @@ public class AdsServerUtility {
       // jump server
       jumpServerSshUser = "pkovurru";
       jumpServerSshPassword = "pa55word";
-      jumpServerSshHostName = "att-stagegw01.phunware.com";
+      jumpServerSshHostName = "att-stagegw01.org.com";
       jumpServerSshPort = 22;
 
       // Actual Server
       serverUser = "developer";
-      serverPassword = "phunware10";
+      serverPassword = "org10";
       serverHostName = "att-devadsrv01";
       serverSshPort = 22;
     }
@@ -49,12 +49,12 @@ public class AdsServerUtility {
       // jump server
       jumpServerSshUser = "pkovurru";
       jumpServerSshPassword = "pa55word";
-      jumpServerSshHostName = "att-stagegw01.phunware.com";
+      jumpServerSshHostName = "att-stagegw01.org.com";
       jumpServerSshPort = 22;
 
       // Actual Server
       serverUser = "developer";
-      serverPassword = "phunware10";
+      serverPassword = "org10";
       serverHostName = "att-stageadsrv01";
       serverSshPort = 22;
     }
@@ -92,7 +92,7 @@ public class AdsServerUtility {
       Channel channel1 = jumpServerSession.openChannel("sftp");
       channel1.connect();
       ChannelSftp sftpChannel = (ChannelSftp) channel1;
-      InputStream pem = sftpChannel.get("phunware-developer.pem");
+      InputStream pem = sftpChannel.get("org-developer.pem");
 
       String result =
           new BufferedReader(new InputStreamReader(pem)).lines().collect(Collectors.joining("\n"));
@@ -151,7 +151,7 @@ public class AdsServerUtility {
   // Update Log4J logging level to trace
   public static void updateLog4jLoggingLevel(String serviceEndPoint, String loggerLevel) {
 
-    String log4j2Path = "/opt/phunware/dsp/current/log4j2.xml";
+    String log4j2Path = "/opt/org/dsp/current/log4j2.xml";
 
     // sed is not supported in stage env - This may be used in the future
     // LogInToServerExecuteShellCommandAndReturnResponse(serviceEndPoint, "sed -i
@@ -159,7 +159,7 @@ public class AdsServerUtility {
 
     logInToServerExecuteShellCommandAndReturnResponse(
         serviceEndPoint,
-        "sudo -u root /bin/cp /home/developer/Automation/log4j2.xml /opt/phunware/dsp/current/log4j2.xml");
+        "sudo -u root /bin/cp /home/developer/Automation/log4j2.xml /opt/org/dsp/current/log4j2.xml");
     LOG.info("Updated Logger level to - " + loggerLevel);
   }
 

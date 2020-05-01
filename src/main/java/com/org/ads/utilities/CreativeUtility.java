@@ -1,4 +1,4 @@
-package com.phunware.ads.utilities;
+package com.org.ads.utilities;
 
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +29,7 @@ public class CreativeUtility {
     String requestBody =
         JsonUtilities.jsonToString(
                 System.getProperty("user.dir")
-                    + "/src/main/java/com/phunware/ads/json/creative.json")
+                    + "/src/main/java/com/org/ads/json/creative.json")
             .replaceAll("advertiserIdToBeChanged", advertiserId)
             .replaceAll("nameToBeChanged", randomvalue);
 
@@ -72,7 +72,7 @@ public class CreativeUtility {
     String requestBody =
         JsonUtilities.jsonToString(
                 System.getProperty("user.dir")
-                    + "/src/main/java/com/phunware/ads/json/creativeJS.json")
+                    + "/src/main/java/com/org/ads/json/creativeJS.json")
             .replaceAll("advertiserIdToBeChanged", advertiserId)
             .replaceAll("nameToBeChanged", randomvalue);
 

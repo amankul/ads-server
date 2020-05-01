@@ -1,6 +1,6 @@
-package com.phunware.ads.tests;
+package com.org.ads.tests;
 
-import com.phunware.ads.utilities.*;
+import com.org.ads.utilities.*;
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -176,13 +176,13 @@ public class PrivateAuction {
     Assert.assertEquals(
         statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
 
-    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
+    // Capture Placement related data from /var/org/dsp/logs/abm-dsp-srv.log
     String data =
         ServerRequestUtility.waitForLogsToGetPopulated(
             serviceEndPoint,
             "grep \"Placement: "
                 + placementID
-                + " Constraint: PmpConstraint is INVALID\" /var/phunware/dsp/logs/abm-dsp-srv.log | tail -1");
+                + " Constraint: PmpConstraint is INVALID\" /var/org/dsp/logs/abm-dsp-srv.log | tail -1");
 
     // looking for PmpConstraint invalidation in logs
     // Expecting "Placement: placementID Constraint: PmpConstraint is INVALID"
@@ -210,13 +210,13 @@ public class PrivateAuction {
     Assert.assertEquals(
         statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
 
-    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
+    // Capture Placement related data from /var/org/dsp/logs/abm-dsp-srv.log
     String data =
         ServerRequestUtility.waitForLogsToGetPopulated(
             serviceEndPoint,
             "grep \"Placement: "
                 + placementID
-                + " Constraint: PmpConstraint is INVALID\" /var/phunware/dsp/logs/abm-dsp-srv.log | tail -1");
+                + " Constraint: PmpConstraint is INVALID\" /var/org/dsp/logs/abm-dsp-srv.log | tail -1");
 
     // looking for PmpConstraint invalidation in logs
     // Expecting "Placement: placementID Constraint: PmpConstraint is INVALID"
@@ -268,13 +268,13 @@ public class PrivateAuction {
       Assert.assertEquals(
           statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
 
-      // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
+      // Capture Placement related data from /var/org/dsp/logs/abm-dsp-srv.log
       String data =
           ServerRequestUtility.waitForLogsToGetPopulated(
               serviceEndPoint,
               "grep \"Placement: "
                   + placementID
-                  + " Constraint: PmpConstraint is INVALID\" /var/phunware/dsp/logs/abm-dsp-srv.log | tail -1");
+                  + " Constraint: PmpConstraint is INVALID\" /var/org/dsp/logs/abm-dsp-srv.log | tail -1");
 
       // looking for PmpConstraint invalidation in logs
       // Expecting "Placement: placementID Constraint: PmpConstraint is INVALID"
@@ -305,13 +305,13 @@ public class PrivateAuction {
       Assert.assertEquals(
           statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
 
-      // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
+      // Capture Placement related data from /var/org/dsp/logs/abm-dsp-srv.log
       String data =
           ServerRequestUtility.waitForLogsToGetPopulated(
               serviceEndPoint,
               "grep \"Placement: "
                   + placementID
-                  + " Constraint: PmpConstraint is INVALID\" /var/phunware/dsp/logs/abm-dsp-srv.log | tail -1");
+                  + " Constraint: PmpConstraint is INVALID\" /var/org/dsp/logs/abm-dsp-srv.log | tail -1");
 
       // looking for PmpConstraint invalidation in logs
       // Expecting "Placement: placementID Constraint: PmpConstraint is INVALID"
@@ -358,7 +358,7 @@ public class PrivateAuction {
 
     String requestBody =
         JsonUtilities.jsonToString(
-                System.getProperty("user.dir") + "/src/main/java/com/phunware/ads/json/" + fileName)
+                System.getProperty("user.dir") + "/src/main/java/com/org/ads/json/" + fileName)
             .replaceAll("DealIDAutomation", "DealIDAutomation" + randomValue);
 
     // Printing Request Details

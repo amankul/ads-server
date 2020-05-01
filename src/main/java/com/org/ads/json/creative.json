@@ -4,11 +4,11 @@
   "creativeTypeId": 1,
   "secure": true,
   "attributeIds": [1,2,3],
-  "clickurl":"http://www.phunware.com",
+  "clickurl":"http://www.org.com",
   "iurlS3AssetId": 10005,
   "s3AssetIds": [10005],
   "dimensionIds": [1],
-  "trackingUrls":["http://www.phunware2.com", "www.phunware3.com/aaa","http://www.phunware4.com","http://www.phunware5.com","http://www.phunware6.com"]
+  "trackingUrls":["http://www.org2.com", "www.org3.com/aaa","http://www.org4.com","http://www.org5.com","http://www.org6.com"]
 }
 
 

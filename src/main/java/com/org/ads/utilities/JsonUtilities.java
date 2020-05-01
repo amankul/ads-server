@@ -1,4 +1,4 @@
-package com.phunware.ads.utilities;
+package com.org.ads.utilities;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

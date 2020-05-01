@@ -1,4 +1,4 @@
-package com.phunware.ads.utilities;
+package com.org.ads.utilities;
 
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.Key;
@@ -41,12 +41,12 @@ public class AeroSpikeUtility {
       // jump server
       jumpServerSshUser = "pkovurru";
       jumpServerSshPassword = "pa55word";
-      jumpServerSshHostName = "att-stagegw01.phunware.com";
+      jumpServerSshHostName = "att-stagegw01.org.com";
       jumpServerSshPort = 22;
 
       // Actual Server
       aerospikeserverUser = "ec2-user";
-      aerospikeserverPassword = "phunware10";
+      aerospikeserverPassword = "org10";
       aerospikeserverHostName =
           "att-devaddspaero01"; // OLD ONE "ec2-54-237-10-197.compute-1.amazonaws.com";
       aerospikeserverSshPort = 22;
@@ -56,12 +56,12 @@ public class AeroSpikeUtility {
       // jump server
       jumpServerSshUser = "pkovurru";
       jumpServerSshPassword = "pa55word";
-      jumpServerSshHostName = "att-stagegw01.phunware.com";
+      jumpServerSshHostName = "att-stagegw01.org.com";
       jumpServerSshPort = 22;
 
       // Actual Server
       aerospikeserverUser = "developer";
-      aerospikeserverPassword = "phunware10";
+      aerospikeserverPassword = "org10";
       aerospikeserverHostName = "att-stageaddspaero01";
       aerospikeserverSshPort = 22;
     }
@@ -102,7 +102,7 @@ public class AeroSpikeUtility {
       ChannelSftp sftpChannel = (ChannelSftp) channelSftp;
       InputStream pem =
           sftpChannel.get(
-              "phunware-developer.pem"); // capturing data from a pem file located in jumpserver
+              "org-developer.pem"); // capturing data from a pem file located in jumpserver
       String result =
           new BufferedReader(new InputStreamReader(pem)).lines().collect(Collectors.joining("\n"));
 

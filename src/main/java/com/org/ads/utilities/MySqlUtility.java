@@ -1,4 +1,4 @@
-package com.phunware.ads.utilities;
+package com.org.ads.utilities;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -43,7 +43,7 @@ public class MySqlUtility {
       // ssh details
       SSH_USER = "pkovurru";
       SSH_PASSWORD = "pa55word";
-      SSH_HOSTNAME = "att-stagegw01.phunware.com";
+      SSH_HOSTNAME = "att-stagegw01.org.com";
       SSH_PORT = 22;
       // db details
       MY_SQL_HOSTNAME = "att-devaddb01";
@@ -59,7 +59,7 @@ public class MySqlUtility {
       // ssh details
       SSH_USER = "pkovurru";
       SSH_PASSWORD = "pa55word";
-      SSH_HOSTNAME = "att-stagegw01.phunware.com";
+      SSH_HOSTNAME = "att-stagegw01.org.com";
       SSH_PORT = 22;
       // db details
       MY_SQL_HOSTNAME = "att-stageaddb01";

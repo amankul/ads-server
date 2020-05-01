@@ -1,4 +1,4 @@
-package com.phunware.ads.utilities;
+package com.org.ads.utilities;
 
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +33,7 @@ public class CampaignUtility {
     String requestBody =
         JsonUtilities.jsonToString(
                 System.getProperty("user.dir")
-                    + "/src/main/java/com/phunware/ads/json/campaign.json")
+                    + "/src/main/java/com/org/ads/json/campaign.json")
             .replaceAll("customerIdToBeChanged", "" + customerID)
             .replaceAll("advertiserIdToBeChanged", "" + advertiserID)
             .replaceAll("nameToBeChanged", randomvalue)

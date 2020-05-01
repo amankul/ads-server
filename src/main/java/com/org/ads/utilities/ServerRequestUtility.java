@@ -1,4 +1,4 @@
-package com.phunware.ads.utilities;
+package com.org.ads.utilities;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -36,7 +36,7 @@ public class ServerRequestUtility {
 
     String requestBody =
         JsonUtilities.jsonToString(
-                System.getProperty("user.dir") + "/src/main/java/com/phunware/ads/json/" + fileName)
+                System.getProperty("user.dir") + "/src/main/java/com/org/ads/json/" + fileName)
             .replaceAll("DealIDAutomation", "DealIDAutomation" + randomValue);
 
     // Printing Request Details
@@ -99,7 +99,7 @@ public class ServerRequestUtility {
 
     String requestBody =
         JsonUtilities.jsonToString(
-                System.getProperty("user.dir") + "/src/main/java/com/phunware/ads/json/" + fileName)
+                System.getProperty("user.dir") + "/src/main/java/com/org/ads/json/" + fileName)
             .replaceAll("DealIDAutomation", "DealIDAutomation" + randomValue);
 
     // Printing Request Details
@@ -127,7 +127,7 @@ public class ServerRequestUtility {
   //Pull data from DB to ADS server
   public static void pullDataToAdsServer(String serviceEndPoint) {
     AdsServerUtility.logInToServerExecuteShellCommandAndReturnResponse(
-        serviceEndPoint, "touch /var/phunware/dsp/data/placements/v1/placements.md5");
+        serviceEndPoint, "touch /var/org/dsp/data/placements/v1/placements.md5");
   }
 
   public static void writeToFile(String data, String filename) {
@@ -170,7 +170,7 @@ public class ServerRequestUtility {
         return data;
       }
     }
-    return "No data found for placement in /var/phunware/dsp/logs/abm-dsp-srv.log";
+    return "No data found for placement in /var/org/dsp/logs/abm-dsp-srv.log";
   }
 
   //Invoke Data Generator via API call
@@ -347,6 +347,6 @@ public class ServerRequestUtility {
 
   public static String getLogData(String serviceEndPoint, String placementID) {
     return AdsServerUtility.logInToServerExecuteShellCommandAndReturnResponse(
-            serviceEndPoint, "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep " + placementID);
+            serviceEndPoint, "cat /var/org/dsp/logs/abm-dsp-srv.log | grep " + placementID);
   }
 }

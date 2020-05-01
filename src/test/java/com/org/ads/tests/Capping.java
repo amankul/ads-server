@@ -1,6 +1,6 @@
-package com.phunware.ads.tests;
+package com.org.ads.tests;
 
-import com.phunware.ads.utilities.*;
+import com.org.ads.utilities.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
@@ -140,13 +140,13 @@ public class Capping {
     // Sending Bid request after the placement cap is reached.
     ServerRequestUtility.postBidRequest_NoSucessCheck(runtimeEndPoint, "runTimeRequest.json");
 
-    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.LOG
+    // Capture Placement related data from /var/org/dsp/logs/abm-dsp-srv.LOG
     String data =
         ServerRequestUtility.waitForLogsToGetPopulated(
             serviceEndPoint,
             "grep \"Placement: "
                 + placementID
-                + " Constraint: BudgetConstraint\" /var/phunware/dsp/logs/abm-dsp-srv.log | tail -1");
+                + " Constraint: BudgetConstraint\" /var/org/dsp/logs/abm-dsp-srv.log | tail -1");
 
     // looking for BudgetConstraint invalidation in logs
     Assert.assertTrue(
@@ -229,13 +229,13 @@ public class Capping {
     Assert.assertEquals(
         statusCode, 204, "Status code returned after sending a bidrequest -" + statusCode);
 
-    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
+    // Capture Placement related data from /var/org/dsp/logs/abm-dsp-srv.log
     String data =
         ServerRequestUtility.waitForLogsToGetPopulated(
             serviceEndPoint,
             "grep \"Placement: "
                 + placementID
-                + " Constraint: DeviceFrequencyCapConstraint is INVALID\" /var/phunware/dsp/logs/abm-dsp-srv.log | tail -1");
+                + " Constraint: DeviceFrequencyCapConstraint is INVALID\" /var/org/dsp/logs/abm-dsp-srv.log | tail -1");
 
     // looking for BudgetConstraint invalidation in logs
     // Expecting "Placement: placementID Constraint: DeviceFrequencyCapConstraint is INVALID"

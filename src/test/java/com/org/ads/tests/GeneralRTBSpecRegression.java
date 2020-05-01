@@ -1,6 +1,6 @@
-package com.phunware.ads.tests;
+package com.org.ads.tests;
 
-import com.phunware.ads.utilities.*;
+import com.org.ads.utilities.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;

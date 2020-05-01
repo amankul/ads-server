@@ -1,4 +1,4 @@
-package com.phunware.ads.data;
+package com.org.ads.data;
 
 
 public class Constants {

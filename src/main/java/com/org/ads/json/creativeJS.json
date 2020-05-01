@@ -10,6 +10,6 @@
   "iurlS3AssetId": 10005,
   "s3AssetIds": [10005],
   "dimensionIds": [1],
-  "trackingUrls":["http://www.phunware.com"],
+  "trackingUrls":["http://www.org.com"],
   "script": "<script src=\"mraid.js\"></script><div class=\"celtra-ad-v3\"><img src=\"data:image/png,celtra\" style=\"display: none\" onerror=\"\n        (function(img) {\n            var params = {'clickUrl':'[click_url]','clickEvent':'firstInteraction','externalAdServer':'Custom','tagVersion':'3'};\n            var req = document.createElement('script');\n            req.id = params.scriptId = 'celtra-script-' + (window.celtraScriptIndex = (window.celtraScriptIndex||0)+1);\n            params.clientTimestamp = new Date/1000;\n            params.clientTimeZoneOffsetInMinutes = new Date().getTimezoneOffset();\n            var src = ((window.location.protocol == 'https:' || /iP(ad|hone|od).*OS ([0-9_]+)/.test(navigator.userAgent)) ? 'https' : 'http') + '://ads.celtra.com/3ac129a8/mraid-ad.js?';\n            for (var k in params) {\n               src += '&amp;' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);\n            }\n            req.src = src;\n            img.parentNode.insertBefore(req, img.nextSibling);\n        })(this);\n    \"/>\n<div>"
 }

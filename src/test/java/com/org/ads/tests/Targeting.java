@@ -1,6 +1,6 @@
-package com.phunware.ads.tests;
+package com.org.ads.tests;
 
-import com.phunware.ads.utilities.*;
+import com.org.ads.utilities.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
@@ -107,15 +107,15 @@ public class Targeting {
     // wait for LOG file to get populated
     ServerRequestUtility.waitForLogsToGetPopulated(
         serviceEndPoint,
-        "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep "
+        "cat /var/org/dsp/logs/abm-dsp-srv.log | grep "
             + "\"Considering placement id "
             + placementID
             + " for Country constraint\"");
 
-    // Capture Placement related data from /var/phunware/dsp/logs/abm-dsp-srv.log
+    // Capture Placement related data from /var/org/dsp/logs/abm-dsp-srv.log
     data =
         AdsServerUtility.logInToServerExecuteShellCommandAndReturnResponse(
-            serviceEndPoint, "cat /var/phunware/dsp/logs/abm-dsp-srv.log | grep " + placementID);
+            serviceEndPoint, "cat /var/org/dsp/logs/abm-dsp-srv.log | grep " + placementID);
     ServerRequestUtility.writeToFile(
         data, System.getProperty("user.dir") + "/src/main/resources/abm-dsp-srv.txt");
 

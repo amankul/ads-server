@@ -1,4 +1,4 @@
-package com.phunware.ads.utilities;
+package com.org.ads.utilities;
 
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +34,7 @@ public class LineItemUtility {
     String requestBody =
         JsonUtilities.jsonToString(
                 System.getProperty("user.dir")
-                    + "/src/main/java/com/phunware/ads/json/lineItem.json")
+                    + "/src/main/java/com/org/ads/json/lineItem.json")
             .replaceAll("budgetDailyToBeChanged", budgetDaily)
             .replaceAll("lineItemTypeIdToBeChanged", lineItemTypeId)
             .replaceAll("campaignIdToBeChanged", campaignID)

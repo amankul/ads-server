@@ -1,7 +1,7 @@
-package com.phunware.ads.tests;
+package com.org.ads.tests;
 
-import com.phunware.ads.utilities.AeroSpikeUtility;
-import com.phunware.ads.utilities.ServerRequestUtility;
+import com.org.ads.utilities.AeroSpikeUtility;
+import com.org.ads.utilities.ServerRequestUtility;
 import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
